@@ -1,0 +1,20 @@
+  #############
+ # Raspberry #
+#############
+py_default_user: pi
+py_default_user_password: raspberry
+
+  ############
+ # Firewall #
+############
+# Permission values are : allow, deny, limit & reject
+firewalls_authorizes_ports:
+  - { port: ssh, permission: limit }
+  - { port: http, permission: allow }
+  - { port: https, permission: allow }
+
+
+  #########
+ # Vault #
+#########
+vault:

@@ -1,0 +1,17 @@
+---
+- name: Firewall | Block all incoming trafic & All outcoming trafic
+  ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: incoming, policy: deny }
+    - { direction: outgoing, policy: allow }
+- name: Firewall | Allow specific ports
+  ufw:
+    port: "{{ item.port }}"
+    rule: "{{ item.permission }}"
+  loop: "{{ firewalls_authorizes_ports }}"
+- name: Firewall | Activate UFW
+  service:
+    name: ufw
+    state: started
