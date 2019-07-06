@@ -25,7 +25,7 @@ TODO
 - In the **vault** section, you must replace the values with your passwords. You need a password for the database root access. You can encrypt your password with this command:
 ```ansible-vault encrypt_string -vvv --vault-password-file .vault_pass ```  
 
-Connect to the Raspberry serveur with SSH. To run Ansible, the server must have **Python** : ```ssh username@raspberry_adress``` 
+Connect to the Raspberry serveur with SSH. To run Ansible, the raspberry must have **Python** : ```ssh username@raspberry_adress``` 
 
 **Distant server**
 

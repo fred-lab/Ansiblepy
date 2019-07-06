@@ -32,7 +32,6 @@
   apt:
     name: fish
     state: present
-    state: present
 - name: Tools | Install Mysql Client
   apt:
     name: mysql-client
