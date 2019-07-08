@@ -1,3 +1,6 @@
 
 [raspberry]
 192.xxx.x.xx 
+
+[raspberry:vars]
+ansible_password='{{ py_default_user_password }}'

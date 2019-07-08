@@ -3,6 +3,7 @@
 #############
 py_default_user: pi
 py_default_user_password: raspberry
+py_root_username: user
 
   ############
  # Firewall #
