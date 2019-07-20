@@ -1,0 +1,28 @@
+---
+- name: "Bokehlicious | Add group {{ username }}"
+  group:
+    name: "{{ username }}"
+    state: present
+- name: Bokehlicious | Find Fish location
+  command: which fish
+  register: fish_location
+- name: "Bokehlicious | Add user {{ username }}"
+  user:
+    name: "{{ username }}"
+    group: "{{ username }}"
+    shell: "{{ fish_location.stdout }}"
+    state: present
+    groups: docker
+    append: yes
+- name: "Bokehlicious | Add SSH key for user {{ username }}"
+  authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
+# - name: "Bokehlicious | Create /home/{{ username }}/www folder"
+#   file:
+#     path: "/home/{{ username }}/www"
+#     state: directory
+#     owner: "{{ username }}"
+#     group: "{{ username }}"
+#     mode: 0770
