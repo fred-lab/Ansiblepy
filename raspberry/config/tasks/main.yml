@@ -4,6 +4,7 @@
     name: "{{ py_default_user }}"
     state: absent
     remove: yes
+    force: yes
 - name: Config | Change locale
   shell: "raspi-config nonint do_change_locale {{ py_locale }}"
 - name: Config | Change timezone
