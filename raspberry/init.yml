@@ -7,14 +7,11 @@
   become: true
   become_method: sudo
   tasks:
-    # - name: APT | Update system
-    #   apt:
-    #     upgrade: dist
-    #     update_cache: yes
-    #     autoclean: yes
-    # - include_role:
-    #     name: raspberry/firewall
-    # - include_role:
-    #     name: raspberry/tools
+    # - name: Config | Add Raspberry Server to known_hosts
+    #   known_hosts:
+    #     path: ~/.ssh/known_hosts
+    #     name: raspberry
+    #     key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
+    #     state: present
     - include_role:
         name: init

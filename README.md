@@ -20,25 +20,27 @@ Create the .vault-pass file : ```touch .vault_pass```
 Update **hosts** with a server name and an IP adress  
 
 Update **parameters.yml** with adequate information :
-TODO
+*TODO*
 
 - In the **vault** section, you must replace the values with your passwords. You need a password for the database root access. You can encrypt your password with this command:
 ```ansible-vault encrypt_string -vvv --vault-password-file .vault_pass ```  
 
-Connect to the Raspberry serveur with SSH. To run Ansible, the raspberry must have **Python** : ```ssh username@raspberry_adress``` 
-
 **Distant server**
+- Connect to raspberry py using ssh with the default Pi user, to add the key to your local *~/.ssh/known_hosts file* (***Only do that at the first startup***) : ```ssh pi@raspberry_ip```  
 
-Run the installation : ```ansible-playbook -i hosts raspberry.yml --flush-cache --vault-password-file .vault_pass --force-handler```  
+*Note : if you reinstall from scratch the raspberry, you have to remove the corresponding key in ~/.ssh/known_hosts*
 
-Deploy an app : ```ansible-playbook -i hosts deploy_bokehlicious_prod.yml  --flush-cache --vault-password-file .vault_pass --force-handler```  
- 
+- Delog Pi user from the raspberry py
+
+- Run the installation **for all the playbook** : ```ansible-playbook -i hosts install.yml --flush-cache --vault-password-file .vault_pass --force-handler```  
+
+If you want to run a specific playbook, they are all in the **raspberry** folder, replace **install.yml** by the specific playbook, like :
+```ansible-playbook -i hosts raspberry/docker.yml --flush-cache --vault-password-file .vault_pass --force-handler```   
 
 ## User
 For security purpose, the logic is to have one superuser with Sudo privilege and create user with no password and no root access to each application. Their names correspond to the name application. 
 This users can only access to theirs **home** folder, which contains the application.  
-For the database, its the same logic, one user for one database, and the user can only access to his own database.  
-
+For the database, its the same logic, one user for one database, and the user can only access to his own database. 
 
 
 ## VIM

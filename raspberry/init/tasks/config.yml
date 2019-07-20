@@ -1,6 +1,0 @@
----
-- name: Config | Remove Pi default user
-  user:
-    name: "{{ py_default_user }}"
-    state: absent
-    remove: yes

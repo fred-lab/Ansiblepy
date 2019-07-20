@@ -1,0 +1,8 @@
+---
+- name: Docker | Check Docker service is running
+  service_facts:
+- name: Docker | Installation
+  include_tasks: docker.yml
+  when: "'docker' not in services"
+- name: Docker-compose | Installation
+  include_tasks: docker_compose.yml

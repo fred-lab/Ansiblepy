@@ -1,5 +1,5 @@
 ---
-- name: Configure raspberry py
+- name: Install Docker
   vars_files:
     - ../parameters.yml
   hosts: raspberry
@@ -8,8 +8,4 @@
   become_method: sudo
   tasks:
     - include_role:
-        name: config
-    - include_role:
-        name: firewall
-    - include_role:
-        name: tools
+        name: docker

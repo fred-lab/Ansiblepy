@@ -1,10 +1,8 @@
 ---
-- name: Config | Raspberry user configuration tasks
+- name: Init | Update system
+  apt:
+    upgrade: dist
+    update_cache: yes
+    autoclean: yes
+- name: Init | Raspberry user configuration tasks
   include_tasks: user.yml
-- name: Config | Raspberry global configuration tasks
-  include_tasks: config.yml
-  args:
-    apply:
-        remote_user: "{{ py_root_username }}"
-        become: yes
-        become_method: sudo

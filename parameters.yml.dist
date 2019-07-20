@@ -4,6 +4,22 @@
 py_default_user: pi
 py_default_user_password: raspberry
 py_root_username: user
+py_root_password: "{{ vault.root_password }}"
+
+py_locale: fr_FR.UTF-8
+py_timezone: "Europe/Paris"
+# See "ls -la /usr/share/X11/xkb/symbols/" to find keybord template
+py_keyboard_layout: "fr"
+
+  #############
+ #   Docker  #
+#############
+docker_host_os: raspbian
+docker_host_os_release: stretch
+docker_host_arch: armhf
+docker_version: stable
+docker_users: 
+ - "{{ py_root_username }}"
 
   ############
  # Firewall #
@@ -14,8 +30,14 @@ firewalls_authorizes_ports:
   - { port: http, permission: allow }
   - { port: https, permission: allow }
 
-
   #########
  # Vault #
 #########
 vault:
+  root_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          1234

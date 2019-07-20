@@ -1,0 +1,9 @@
+---
+# Launch the global installation of my raspberry py's webserver
+#
+# Initialize the Py with a new root user
+- import_playbook: ./raspberry/init.yml
+# Configure the Py
+- import_playbook: ./raspberry/config.yml
+# Install Docker
+- import_playbook: ./raspberry/docker.yml

@@ -28,13 +28,18 @@
   apt:
     name: libpng-dev
     state: present
+- name: Tools | Install Mysql Client
+  apt:
+    name: mariadb-client
+    state: present
 - name: Tools | Install Fish
   apt:
     name: fish
     state: present
-- name: Tools | Install Mysql Client
-  apt:
-    name: mysql-client
-    state: present
-#- name: Tools | Enable Fish
-#  command: chsh -s /usr/local/bin/fish
+- name: Tools | Find Fish location
+  command: which fish
+  register: fish_location
+- name: "Tools | Enable Fish for {{ py_root_username }}"
+  user:
+    name: "{{ py_root_username }}"
+    shell: "{{ fish_location.stdout }}"

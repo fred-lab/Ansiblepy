@@ -13,3 +13,5 @@
 - name: Config | Expand File System
   shell: "raspi-config nonint do_expand_rootfs"
   notify: raspberry reboot
+- name: Config | Reload partition table
+  shell: partprobe
