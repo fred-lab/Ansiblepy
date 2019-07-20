@@ -1,0 +1,19 @@
+---
+- name: Init | Create new root user
+  user:
+    name: "{{ py_root_username }}"
+    shell: /bin/bash
+    state: present
+- name: Init | Add root user to sudo group
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: "pi ALL=(ALL) NOPASSWD: ALL"
+    line: "{{ py_root_username }} ALL=(ALL) NOPASSWD: ALL"
+    validate: /usr/sbin/visudo -cf %s
+- name: "Init | Add SSH key for user {{ py_root_username }}"
+  authorized_key:
+    user: "{{ py_root_username }}"
+    state: present
+    key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
+  notify: raspberry reboot

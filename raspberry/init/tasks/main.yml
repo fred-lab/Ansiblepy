@@ -1,0 +1,8 @@
+---
+- name: Init | Update system
+  apt:
+    upgrade: dist
+    update_cache: yes
+    autoclean: yes
+- name: Init | Raspberry user configuration tasks
+  include_tasks: user.yml

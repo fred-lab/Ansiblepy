@@ -1,0 +1,5 @@
+---
+- name: Firewall | Install task
+  include_tasks: install.yml
+- name: Firewall | Configure task
+  include_tasks: config.yml

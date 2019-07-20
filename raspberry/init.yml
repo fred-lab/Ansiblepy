@@ -1,0 +1,17 @@
+---
+- name: Init raspberry py
+  vars_files:
+    - ../parameters.yml
+  hosts: raspberry
+  remote_user: "{{ py_default_user }}"
+  become: true
+  become_method: sudo
+  tasks:
+    # - name: Config | Add Raspberry Server to known_hosts
+    #   known_hosts:
+    #     path: ~/.ssh/known_hosts
+    #     name: raspberry
+    #     key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
+    #     state: present
+    - include_role:
+        name: init

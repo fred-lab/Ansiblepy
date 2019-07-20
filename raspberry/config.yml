@@ -1,0 +1,15 @@
+---
+- name: Configure raspberry py
+  vars_files:
+    - ../parameters.yml
+  hosts: raspberry
+  remote_user: "{{ py_root_username }}"
+  become: true
+  become_method: sudo
+  tasks:
+    - include_role:
+        name: config
+    - include_role:
+        name: firewall
+    - include_role:
+        name: tools

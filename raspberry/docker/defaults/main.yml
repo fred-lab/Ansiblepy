@@ -1,0 +1,8 @@
+---
+docker_host_os: debian
+docker_host_os_release: stretch
+docker_host_arch: amd64
+docker_version: stable
+docker_users: 
+  - user1
+  - user2

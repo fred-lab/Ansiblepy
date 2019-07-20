@@ -1,0 +1,18 @@
+---
+- name: Config | Remove Pi default user
+  user:
+    name: "{{ py_default_user }}"
+    state: absent
+    remove: yes
+    force: yes
+- name: Config | Change locale
+  shell: "raspi-config nonint do_change_locale {{ py_locale }}"
+- name: Config | Change timezone
+  shell: "raspi-config nonint do_change_timezone {{ py_timezone }}"
+- name: Config | Change Keybord layout
+  shell: "raspi-config nonint do_configure_keyboard {{ py_keyboard_layout}}"
+- name: Config | Expand File System
+  shell: "raspi-config nonint do_expand_rootfs"
+  notify: raspberry reboot
+- name: Config | Reload partition table
+  shell: partprobe

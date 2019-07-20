@@ -1,0 +1,63 @@
+---
+- name : Docker | Install Docker dependencies
+  apt:
+      update_cache: yes
+      name:
+        - apt-transport-https
+        - software-properties-common
+        - ca-certificates
+        - gnupg2
+      state: present
+# - name: Docker| Check if Docker's installation script is present
+#   stat:
+#     path: /tmp/get-docker.sh
+#   register: docker_script
+# - name : Docker | Download Docker's installation script
+#   get_url:
+#     url: https://get.docker.com/
+#     dest: /tmp/get-docker.sh
+#   when: docker_script.stat.exists == false
+# - name : Docker | Change Docker's script permissions
+#   file:
+#     path: /tmp/get-docker.sh
+#     mode: u+x
+# - name : Docker | Execute Docker's installation script
+#   shell: /tmp/get-docker.sh
+# - name : Docker | Remove Docker's script permissions
+#   file:
+#     path: /tmp/get-docker.sh
+#     state: absent
+- name: Docker | Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg 
+- name: Docker | Add Docker repository
+  apt_repository:
+    repo: "deb [arch={{docker_host_arch}}] https://download.docker.com/linux/{{ docker_host_os }} {{ docker_host_os_release }} {{docker_version | default('stable')}}"
+    state: present
+- name: Docker | Update cache
+  apt:
+      update_cache: yes
+- name: Docker | Install Docker
+  apt:
+      install_recommends: no
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      state: present
+- name: "Docker | Add a list of user to Docker's"
+  user:
+    name: "{{item}}"
+    groups: docker
+    append: yes
+  loop: "{{docker_users}}"
+- name: Docker | Restart Docker
+  service:
+    name: docker.service
+    state: restarted
+- name: Docker | Remove useless packages from the cache
+  apt:
+    autoclean: yes
+- name: Docker | Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
