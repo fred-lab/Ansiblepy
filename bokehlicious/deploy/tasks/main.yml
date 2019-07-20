@@ -8,3 +8,11 @@
     autoclean: yes
 - name: Bokehlicious | Configure User
   include_tasks: ./server/user.yml
+- name: Bokehlicious | Configure SSH
+  include_tasks: ./server/ssh.yml
+- include_role:
+    name: ansistrano.deploy
+    apply:
+      remote_user: "{{ username }}"
+      become: no
+      become_method: sudo
