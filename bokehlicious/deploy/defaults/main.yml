@@ -3,6 +3,7 @@ username : bokehlicious
 project_name : bokehlicious
 domain : bokehlicious.fr
 deploy_private_key: ~/.ssh/deploy_bokehlicious
+project_deploy_dir: "/home/{{ username }}/www"
 # git_hostname : gitlab.com || github.com
 git_hostname: gitlab.com
 git_repo: git@gitlab.com/alcyon/bokehlicious.git

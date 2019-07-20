@@ -1,6 +1,6 @@
 ---
-# - name: Bokehlicious | Include Ansistrano variables
-#   include_vars: ansistrano.yml
+- name: Bokehlicious | Include Ansistrano variables
+  include_vars: ansistrano.yml
 - name: Bokehlicious | Start deployment
   apt:
     upgrade: dist

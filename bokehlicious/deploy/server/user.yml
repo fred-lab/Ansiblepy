@@ -19,10 +19,10 @@
     user: "{{ username }}"
     state: present
     key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
-# - name: "Bokehlicious | Create /home/{{ username }}/www folder"
-#   file:
-#     path: "/home/{{ username }}/www"
-#     state: directory
-#     owner: "{{ username }}"
-#     group: "{{ username }}"
-#     mode: 0770
+- name: "Bokehlicious | Create {{project_deploy_dir }} folder"
+  file:
+    path: "{{project_deploy_dir}}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0770
