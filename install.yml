@@ -7,3 +7,5 @@
 - import_playbook: ./raspberry/config.yml
 # Install Docker
 - import_playbook: ./raspberry/docker.yml
+# Deploy Bokehlicious
+- import_playbook: ./bokehlicious/deploy.yml

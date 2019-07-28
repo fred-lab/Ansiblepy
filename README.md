@@ -15,7 +15,7 @@ Create **parameters.yml** file : ```cp parameters.yml parameters.yml.dist```
 
 Create **hosts** file : ```cp hosts.yml hosts.yml.dist```  
 
-Create the .vault-pass file : ```touch .vault_pass```  
+Create the **.vault-pass file** : ```touch .vault_pass```  
 
 Update **hosts** with a server name and an IP adress  
 

@@ -1,0 +1,34 @@
+---
+- name: Before symlink | Bokehlicious | Get {{ username }} UID
+  command: id -u
+  register: user_uid
+- name: Before symlink | Bokehlicious | Get {{ username }} GID
+  command: id -g
+  register: user_gid
+- name: Before symlink | Bokehlicious | Create docker-compose.yml file
+  template:
+    src: docker-compose.j2
+    dest: "{{ ansistrano_release_path.stdout }}/docker-compose.yml"
+- name: Before symlink | Bokehlicious | Generate .env file
+  template:
+    src: env.j2
+    dest: "{{ ansistrano_release_path.stdout }}/.env"
+- name: Before symlink | Bokehlicious | Copy parameters.json file
+  copy:
+    src: "{{ ansistrano_release_path.stdout }}/parameters.json.example"
+    dest: "{{ ansistrano_release_path.stdout }}/parameters.json"
+    remote_src: yes
+- name: Before symlink | Bokehlicious | Create subfolders for Storage folder
+  file:
+    path: "{{ ansistrano_release_path.stdout }}/{{ item }}"
+    state: directory
+    mode: 0775
+    recurse: yes
+  with_items:
+    - storage/app/public
+    - storage/framework/cache
+    - storage/framework/sessions
+    - storage/framework/testing
+    - storage/framework/views
+    - storage/logs
+
