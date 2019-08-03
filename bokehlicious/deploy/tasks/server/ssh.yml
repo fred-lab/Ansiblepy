@@ -1,22 +1,22 @@
 
 ---
-- name: Copy SSH Private Key
+- name: Bokehlicious | Server | Copy SSH Private Key
   copy:
     src: "{{ deploy_private_key }}"
     dest: "/home/{{ username }}/.ssh/deploy_key"
     mode: 0600
     owner: "{{ username }}"
     group: "{{ username }}"
-- name: Copy SSH public Key
+- name: Bokehlicious | Server | Copy SSH public Key
   copy:
     src: "{{ deploy_private_key }}.pub"
     dest: "/home/{{ username }}/.ssh/deploy_key.pub"
     owner: "{{ username }}"
     group: "{{ username }}"
-- name: Ensure setfacl support is present.
+- name: Bokehlicious | Server | Ensure setfacl support is present.
   package: 
     name: acl
-- name: configure ssh to use ansible key for github.com
+- name: Bokehlicious | Server | configure ssh to use ansible key for github.com
   template:
     src: templates/ssh_config.j2
     dest: "/home/{{ username }}/.ssh/config"

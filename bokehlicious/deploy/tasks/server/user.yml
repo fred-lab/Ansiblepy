@@ -1,12 +1,12 @@
 ---
-- name: "Bokehlicious | Add group {{ username }}"
+- name: "Bokehlicious | Server | Add group {{ username }}"
   group:
     name: "{{ username }}"
     state: present
-- name: Bokehlicious | Find Fish location
+- name: Bokehlicious | Server | Find Fish location
   command: which fish
   register: fish_location
-- name: "Bokehlicious | Add user {{ username }}"
+- name: "Bokehlicious | Server | Add user {{ username }}"
   user:
     name: "{{ username }}"
     group: "{{ username }}"
@@ -14,12 +14,12 @@
     state: present
     groups: docker
     append: yes
-- name: "Bokehlicious | Add SSH key for user {{ username }}"
+- name: "Bokehlicious | Server | Add SSH key for user {{ username }}"
   authorized_key:
     user: "{{ username }}"
     state: present
     key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
-- name: "Bokehlicious | Create {{project_deploy_dir }} folder"
+- name: "Bokehlicious | Server | Create {{project_deploy_dir }} folder"
   file:
     path: "{{project_deploy_dir}}"
     state: directory

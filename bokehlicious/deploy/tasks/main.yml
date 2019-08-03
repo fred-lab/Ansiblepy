@@ -10,6 +10,8 @@
   include_tasks: ./server/user.yml
 - name: Bokehlicious | Configure SSH
   include_tasks: ./server/ssh.yml
+- name: Bokehlicious | Install dependencies
+  include_tasks: ./server/dependencies.yml
 - include_role:
     name: ansistrano.deploy
     apply:

@@ -1,0 +1,11 @@
+- name: Bokehlicious | Server | Install PyMySQL
+  apt:
+    update_cache: yes
+    name: python-mysqldb
+    state: present
+# - name: Bokehlicious | Server | Remove useless packages from the cache
+#   apt:
+#     autoclean: yes
+# - name: Bokehlicious | Server | Remove dependencies that are no longer required
+#   apt:
+#     autoremove: yes

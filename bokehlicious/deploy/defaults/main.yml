@@ -1,9 +1,23 @@
 ---
+env: prod
 username : bokehlicious
 project_name : bokehlicious
 domain : bokehlicious.fr
+admin_firstname: fred
+admin_lastname: gauthier
+admin_email: fred.gauthier.photo@gmail.com
+admin_password: "{{vault.bokehlicious_admin_password}}"
 deploy_private_key: ~/.ssh/deploy_bokehlicious
 project_deploy_dir: "/home/{{ username }}/www"
-# git_hostname : gitlab.com || github.com
+# git_hostname => gitlab.com || github.com
 git_hostname: gitlab.com
 git_repo: git@gitlab.com/alcyon/bokehlicious.git
+
+# Database
+DB_CONNECTION: mysql
+DB_HOST: database # Name of the database service in docker-compose.yml
+DB_PORT: 3306
+DB_DATABASE: db_name
+DB_USERNAME: db_user
+DB_PASSWORD: db_password
+DB_ROOT_PASSWORD: db_root_password

@@ -17,6 +17,10 @@ py_keyboard_layout: "fr"
 username : bokehlicious
 project_name : bokehlicious
 domain : bokehlicious.fr
+admin_firstname: foo
+admin_lastname: bar
+admin_email: foo@bar.com
+admin_password: "{{vault.bokehlicious_admin_password}}"
 deploy_private_key: ~/.ssh/deploy_ssh_key
 project_deploy_dir: "/home/{{ username }}/www"
 # git_hostname : gitlab.com || github.com
@@ -29,7 +33,9 @@ DB_HOST: database # Name of the database service in docker-compose.yml
 DB_PORT: 3306
 DB_DATABASE: homestead
 DB_USERNAME: homestead
-DB_PASSWORD: secret
+DB_PASSWORD: "{{ vault.bokehlicious_database_user_password }}"
+DB_ROOT_PASSWORD: "{{ vault.bokehlicious_database_root_password }}"
+
 
   #############
  #   Docker  #
@@ -69,6 +75,13 @@ vault:
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           1234
   bokehlicious_database_root_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          1234
+  bokehlicious_admin_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
