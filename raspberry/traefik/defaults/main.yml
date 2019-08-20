@@ -1,0 +1,5 @@
+---
+traefik_contact_mail: foo@bar.com
+traefik_admin_port: 8080
+traefik_port: 80
+traefik_logs_path: /var/log/traefik

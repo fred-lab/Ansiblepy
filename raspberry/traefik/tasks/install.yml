@@ -1,0 +1,25 @@
+---
+- name: "Traefik | Create logs dir in {{ traefik_logs_path }}"
+  file:
+    path: "{{ traefik_logs_path }}"
+    state: directory
+    mode: "0755"
+- name: Traefik | Add docker-compose.yml
+  template:
+    src: templates/docker-compose.j2
+    dest: "/home/{{ py_root_username }}/traefik/docker-compose.yml"
+    owner: "{{ py_root_username }}"
+    group: "{{ py_root_username }}"
+- name: Traefik | Add traefik.toml
+  template:
+    src: templates/traefik_toml.j2
+    dest: "/home/{{ py_root_username }}/traefik/traefik.toml"
+    owner: "{{ py_root_username }}"
+    group: "{{ py_root_username }}"
+- name: Traefik | Start container
+  docker_compose:
+    project_src: "/home/{{ py_root_username }}/traefik"
+    build: yes
+    nocache: yes
+    remove_orphans: yes
+    state: present

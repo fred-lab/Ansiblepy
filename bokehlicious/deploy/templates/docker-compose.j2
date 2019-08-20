@@ -6,8 +6,6 @@ services:
     image: nginx:mainline-alpine
     container_name: front
     restart: always
-    ports:
-      - 80:80
     volumes:
       - .:/home/docker
       - {{ ansistrano_shared_path }}:/shared
@@ -15,6 +13,10 @@ services:
       - ./docker/front/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - engine
+    labels:
+      - traefik.port=80
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:{{domain}},www.{{domain}}
 
 #  Log into this container with : docker-compose exec engine sh
   engine: 
