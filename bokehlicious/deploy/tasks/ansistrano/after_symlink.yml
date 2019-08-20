@@ -1,4 +1,9 @@
 ---
+- name: After symlink | Bokehlicious | Register all Docker containers
+  command: docker ps -q 
+  register: docker_containers
+- debug:
+    var: docker_containers
 - name: After symlink | Bokehlicious | Dump database
   mysql_db:
     login_host: "127.0.0.1"
@@ -8,17 +13,14 @@
     state: dump
     name: "{{DB_DATABASE}}"
     target: "/tmp/{{ ansible_date_time.iso8601_basic_short }}_{{ DB_DATABASE }}.sql"
-- name: After symlink | Bokehlicious | Register all Docker containers
-  command: docker ps -q 
-  register: docker_containers
-- debug:
-    var: docker_containers
+  when: docker_containers.stdout_lines | length>0
 - name: After symlink | Bokehlicious | Stop all Docker containers
   command: docker stop {{ item}} 
   with_items: "{{docker_containers.stdout_lines}}"
-  when: docker_containers.stdout_lines != 0
+  when: docker_containers.stdout_lines | length>0
 - name: After symlink | Bokehlicious | Remove all Docker containers
   command: docker system prune --volumes -f
+  when: docker_containers.stdout_lines | length>0
 - name: After symlink | Bokehlicious | Stop and remove Docker containers
   docker_compose:
     project_src: "{{ ansistrano_release_path.stdout}}"
