@@ -46,7 +46,7 @@ filePath = "log/access.log"
 # Optional
 # Default: "ERROR"
 #
-logLevel = "DEBUG"
+logLevel = "{{traefik_log_level}}"
 
 # Backends throttle duration: minimum duration in seconds between 2 events from providers
 # before applying a new configuration. It avoids unnecessary reloads if multiples events
@@ -121,7 +121,7 @@ defaultEntryPoints = ["http", "https"]
 #
 # Required
 #
-# email = "{{ traefik_contact_mail }}"
+email = "{{ traefik_contact_mail }}"
 
 # File or key used for certificates storage.
 # WARNING, if you use Traefik in Docker, you have 2 options:
@@ -134,14 +134,14 @@ defaultEntryPoints = ["http", "https"]
 #
 # Required
 #
-# storage = "acme.json" # or "traefik/acme/account" if using KV store
+storage = "acme.json"
 
 # Entrypoint to proxy acme challenge/apply certificates to.
 # WARNING, must point to an entrypoint on port 443
 #
 # Required
 #
-# entryPoint = "https"
+entryPoint = "https"
 
 # Use a DNS based acme challenge rather than external HTTPS access, e.g. for a firewalled server
 # Select the provider that matches the DNS domain that will host the challenge TXT record,
@@ -193,7 +193,7 @@ defaultEntryPoints = ["http", "https"]
 #
 # Optional
 #
-# OnHostRule = true
+OnHostRule = true
 
 # CA server to use
 # Uncomment the line to run on the staging let's encrypt server
@@ -221,8 +221,8 @@ defaultEntryPoints = ["http", "https"]
 #   main = "local4.com"
 
 
-# [acme.httpChallenge]
-# entryPoint = "http"
+[acme.httpChallenge]
+entryPoint = "http"
 
 
 # Entrypoints definition
@@ -234,14 +234,14 @@ defaultEntryPoints = ["http", "https"]
 #   address = ":80"
 #
 # To redirect an http entrypoint to an https entrypoint (with SNI support):
-#[entryPoints]
-#  [entryPoints.http]
-#  address = ":80"
-#    [entryPoints.http.redirect]
-#      entryPoint = "https"
-#  [entryPoints.https]
-#  address = ":443"
-#    [entryPoints.https.tls]
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+      entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
 #      [[entryPoints.https.tls.certificates]]
 #      CertFile = "certs/traefik.crt"
 #      KeyFile = "certs/traefik.key"
@@ -434,13 +434,13 @@ endpoint = "unix:///var/run/docker.sock"
 #
 # Required
 #
-#domain = "example.dev"
+domain = "www.{{domain}}"
 
 # Enable watch docker changes
 #
 # Optional
 #
-# watch = true
+watch = true
 
 # Override default configuration template. For advanced users :)
 #
