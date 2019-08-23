@@ -1,6 +1,14 @@
 ---
-- name: PiHole | Check Docker service is running
-  service_facts:
-- name: PiHole | Add a new user
-  include_tasks: user.yml
-  when: "'docker' in services"
+# - name: PiHole | Check Docker service is running
+#   service_facts:
+# - name: PiHole | Add a new user
+#   include_tasks: user.yml
+#   when: "'docker' in services"
+- name: PiHole | Install PiHole
+  include_tasks: install.yml
+  args:
+    apply:
+        remote_user: "{{ pihole_username }}"
+        become: no
+        become_method: sudo
+  # when: "'docker' in services"
