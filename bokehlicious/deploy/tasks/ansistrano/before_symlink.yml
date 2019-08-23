@@ -7,7 +7,7 @@
   register: user_gid
 - name: Before symlink | Bokehlicious | Create docker-compose.yml file
   template:
-    src: docker-compose.j2
+    src: docker-compose.yml.j2
     dest: "{{ ansistrano_release_path.stdout }}/docker-compose.yml"
 - name: Before symlink | Bokehlicious | Generate .env file
   template:
@@ -31,4 +31,3 @@
     - storage/framework/testing
     - storage/framework/views
     - storage/logs
-

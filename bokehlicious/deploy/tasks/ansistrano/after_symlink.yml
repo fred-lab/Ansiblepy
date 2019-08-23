@@ -1,9 +1,11 @@
 ---
 - name: After symlink | Bokehlicious | Register all Docker containers
-  command: docker ps -q 
+  # See https://github.com/ansible/ansible/issues/21304
+  command: docker ps --format "{% raw %}{{.Names}}{% endraw %}"
   register: docker_containers
 - debug:
     var: docker_containers
+  when: docker_containers.stdout.find('bokehlicious') != -1
 - name: After symlink | Bokehlicious | Dump database
   mysql_db:
     login_host: "127.0.0.1"
@@ -12,15 +14,16 @@
     login_password: "{{DB_PASSWORD}}"
     state: dump
     name: "{{DB_DATABASE}}"
-    target: "/tmp/{{ ansible_date_time.iso8601_basic_short }}_{{ DB_DATABASE }}.sql"
-  when: docker_containers.stdout_lines | length>0
+    target: "/tmp/{{ project_name }}_{{ DB_DATABASE }}_{{ ansible_date_time.iso8601_basic_short }}.sql"
+  when: "'bokehlicious_database' in docker_containers.stdout_lines"
 - name: After symlink | Bokehlicious | Stop all Docker containers
-  command: docker stop {{ item}} 
+  command: docker stop {{ item}}
   with_items: "{{docker_containers.stdout_lines}}"
-  when: docker_containers.stdout_lines | length>0
+  when: docker_containers.stdout.find('bokehlicious') != -1
 - name: After symlink | Bokehlicious | Remove all Docker containers
-  command: docker system prune --volumes -f
-  when: docker_containers.stdout_lines | length>0
+  command: docker rm {{ item}} -f
+  with_items: "{{docker_containers.stdout_lines}}"
+  when: docker_containers.stdout.find('bokehlicious') != -1
 - name: After symlink | Bokehlicious | Stop and remove Docker containers
   docker_compose:
     project_src: "{{ ansistrano_release_path.stdout}}"
@@ -38,26 +41,26 @@
 - debug:
     var: output
 - name: After symlink | Laravel | Install composer dependencies
-  command: docker exec -it engine sh -c "{{item}}"
+  command: docker exec -it bokehlicious_engine sh -c "{{item}}"
   with_items:
     - "composer install"
     - "composer dump-autoload"
 - name: After symlink | Laravel | Generate Key application
-  command: docker exec -it engine sh -c "php artisan key:generate"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan key:generate"
 - name: After symlink | Laravel | Run migration
-  command: docker exec -it engine sh -c "php artisan migrate"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan migrate"
 - name: After symlink | Laravel | Update AdminSeeder.php
   replace:
     path: "{{ ansistrano_release_path.stdout }}/database/seeds/AdminSeeder.php"
     regexp: "{{ item.search }}"
     replace: "{{ item.replaceBy }}"
   with_items:
-    - {search: admin@demo\.com,  replaceBy: "{{ admin_email }}"}
-    - {search: "admin",  replaceBy: "{{ admin_firstname }}"}
-    - {search: "demo",  replaceBy: "{{ admin_lastname }}"}
-    - {search: "secret",  replaceBy: "{{ admin_password }}"}
+    - { search: admin@demo\.com, replaceBy: "{{ admin_email }}" }
+    - { search: "admin", replaceBy: "{{ admin_firstname }}" }
+    - { search: "demo", replaceBy: "{{ admin_lastname }}" }
+    - { search: "secret", replaceBy: "{{ admin_password }}" }
 - name: After symlink | Laravel | Seed Database
-  command: docker exec -it engine sh -c "php artisan db:seed"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan db:seed"
 - name: After symlink | Laravel | Edit DatabaseSeeder.php
   lineinfile:
     path: "{{ ansistrano_release_path.stdout }}/database/seeds/DatabaseSeeder.php"
@@ -68,15 +71,15 @@
     path: "{{ ansistrano_release_path.stdout }}/database/seeds/AdminSeeder.php"
     state: absent
 - name: After symlink | Laravel | Install Laravel Passport
-  command: docker exec -it engine sh -c "php artisan passport:install"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan passport:install"
 - name: After symlink | Laravel | Update Parameters.json
-  command: docker exec -it engine sh -c "php artisan bokehlicious:token"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan bokehlicious:token"
 - name: After symlink | Laravel | Cache the configuration
-  command: docker exec -it engine sh -c "php artisan config:cache"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan config:cache"
 - name: After symlink | Laravel | Optimize the configuration
-  command: docker exec -it engine sh -c "php artisan optimize"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan optimize"
 - name: After symlink | Laravel | Clear all caches
-  command: docker exec -it engine sh -c "php artisan {{ item }}"
+  command: docker exec -it bokehlicious_engine sh -c "php artisan {{ item }}"
   with_items:
     - cache:clear
     - view:clear

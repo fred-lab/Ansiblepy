@@ -1,5 +1,11 @@
 ---
 traefik_contact_mail: foo@bar.com
 traefik_admin_port: 8080
-traefik_port: 80
-traefik_logs_path: /var/log/traefik
+traefik_http_port: 80
+traefik_https_port: 443
+traefik_path: "/home/foobar/traefik"
+# DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+traefik_log_level: DEBUG
+traefik_dashboard_entrypoint: traefik
+traefik_network: web
+traefik_dashboard_pwd: foobar
