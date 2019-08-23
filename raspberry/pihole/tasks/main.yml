@@ -1,0 +1,6 @@
+---
+- name: PiHole | Check Docker service is running
+  service_facts:
+- name: PiHole | Add a new user
+  include_tasks: user.yml
+  when: "'docker' in services"

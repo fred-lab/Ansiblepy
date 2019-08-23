@@ -61,6 +61,11 @@ traefik_dashboard_entrypoint: traefik
 traefik_network: web
 traefik_dashboard_pwd: "{{ vault.traefik_dashboard_password }}"
 
+    #############
+  #   PiHole          #
+#############
+pihole_username: foobar
+
   ############
  # Firewall #
 ############
