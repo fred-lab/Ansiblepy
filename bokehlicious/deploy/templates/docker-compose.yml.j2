@@ -1,10 +1,10 @@
-version: '3'
+version: '3.7'
 
 services:
 #  Log into this container with : docker-compose exec front sh
   front:
     image: nginx:mainline-alpine
-    container_name: front
+    container_name: bokehlicious_front
     restart: always
     volumes:
       - .:/home/docker
@@ -14,9 +14,23 @@ services:
     depends_on:
       - engine
     labels:
-      - traefik.port=80
-      - traefik.enable=true
-      - traefik.frontend.rule=Host:{{domain}},www.{{domain}}
+      - "traefik.docker.network=web"
+      - "traefik.port=80"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:www.{{domain}}"
+      - "traefik.backend={{project_name}}"
+      # Security headers
+      - "traefik.frontend.headers.SSLRedirect=true"
+      - "traefik.frontend.headers.STSSeconds=315360000"
+      - "traefik.frontend.headers.browserXSSFilter=true"
+      - "traefik.frontend.headers.contentTypeNosniff=true"
+      - "traefik.frontend.headers.forceSTSHeader=true"
+      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+      - "traefik.frontend.headers.STSPreload=true"
+      - "traefik.frontend.headers.frameDeny=true"
+    networks:
+      - {{traefik_network}}
+      - {{project_name}}
 
 #  Log into this container with : docker-compose exec engine sh
   engine: 
@@ -27,7 +41,7 @@ services:
       # project dir permission inside the container
       - HOST_USER={{ user_uid.stdout }}
       - HOST_USERGROUP={{ user_gid.stdout }}
-    container_name: engine
+    container_name: bokehlicious_engine
     restart: always 
     ports:
       - 9000:9000
@@ -37,12 +51,14 @@ services:
       - ./docker/engine/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     depends_on:
       - database
+    networks:
+      - {{project_name}}
 
 #  Log into this container with : docker-compose exec database sh
   database:    
     env_file: .env
     build: ./docker/database
-    container_name: database
+    container_name: bokehlicious_database
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD={{ DB_ROOT_PASSWORD }}
@@ -53,6 +69,8 @@ services:
       # - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     ports:
       - 3306:3306
+    networks:
+      - {{project_name}}
 
 # A package.json file is required with script command (npm run watch, npm run dev....)
 #  Log into this container with : docker-compose exec build sh
@@ -64,10 +82,18 @@ services:
       # project dir permission inside the container
       - HOST_USER={{ user_uid.stdout }}
       - HOST_USERGROUP={{ user_gid.stdout }}
-    container_name: build
+    container_name: bokehlicious_build
     restart: always
     volumes:
       - ./:/home/docker:rw
       - {{ ansistrano_shared_path }}:/shared
     #    Insert the NPM run command, from the package.json, to execute at startup
     command: "npm run production"
+    networks:
+      - {{project_name}}
+
+networks:
+  {{project_name}}:
+    name: {{ project_name}}
+  web:
+    external: true
