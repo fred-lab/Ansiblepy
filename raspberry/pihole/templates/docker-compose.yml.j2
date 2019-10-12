@@ -10,7 +10,7 @@ services:
     container_name: cloudflared
     restart: always
     networks:
-      pihole
+      pihole:
       cloudflared_net:
         # Define a static ip for the container. The containter can be accessible by outside with this IP.
         ipv4_address: 172.28.1.1
@@ -22,10 +22,11 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       - "67:67/udp"
-      - "80:80/tcp"
-      - "443:443/tcp"
+      #- "80:80/tcp"
+      #- "443:443/tcp"
     environment:
-      TZ: "pihole_timezone:"
+      ServerIP: "{{pihole_host_local_ip}}"
+      TZ: "{{pihole_timezone}}"
       # http://pi.hole/admin password.
       WEBPASSWORD: "{{pihole_password}}"
       #Primary upstream DNS provider. it must be the static IP of Cloudflared container
@@ -35,8 +36,8 @@ services:
       DNSMASQ_LISTENING: "{{pihole_DNSMASQ_LISTENING}}"
     # Volumes store your data between container upgrades
     volumes:
-       - './etc-pihole/:/etc/pihole/'
-       - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+       - '../config/etc-pihole/:/etc/pihole/'
+       - '../config/etc-dnsmasq.d/:/etc/dnsmasq.d/'
     dns:
       - 127.0.0.1
       - 1.1.1.1
@@ -47,10 +48,19 @@ services:
     restart: always
     networks:
       - pihole
+      - {{traefik_network}}
     depends_on:
       - cloudflared
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.port=80"
+      - "traefik.enable=true"
+      - "traefik.backend=pihole"
+      - "traefik.frontend.rule=Host:pihole.{{domain}}"
 
 networks:
+  web:
+    external: true
   pihole:
     name: pihole
   cloudflared_net:

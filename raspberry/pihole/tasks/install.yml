@@ -1,83 +1,67 @@
 ---
-- name: Pihole | Server | Copy SSH Private Key
-  copy:
-    src: "{{ deploy_private_key }}"
-    dest: "/home/{{ pihole_username }}/.ssh/deploy_key"
-    mode: 0600
-    owner: "{{ pihole_username }}"
-    group: "{{ pihole_username }}"
-- name: Pihole | Server | Copy SSH public Key
-  copy:
-    src: "{{ deploy_private_key }}.pub"
-    dest: "/home/{{ pihole_username }}/.ssh/deploy_key.pub"
-    owner: "{{ pihole_username }}"
-    group: "{{ pihole_username }}"
-- name: Pihole | Server | Ensure setfacl support is present.
-  package: 
-    name: acl
-- name: Pihole | Server | configure ssh to use ansible key for github.com
-  template:
-    src: templates/ssh_config.j2
-    dest: "/home/{{ pihole_username }}/.ssh/config"
-    owner: "{{ pihole_username }}"
-    group: "{{ pihole_username }}"
-- name: "Traefik | Create install dir in /home/{{pihole_username}}/pihole"
+- name: Pihole | Register all Docker containers
+  # See https://github.com/ansible/ansible/issues/21304
+  command: docker ps --filter "network=pihole" --format "{% raw %}{{.Names}}{% endraw %}"
+  register: pihole_containers
+- debug:
+    var: pihole_containers
+
+- name: Pihole | Stop all Pihole containers
+  command: docker stop {{ item}}
+  with_items: "{{pihole_containers.stdout_lines}}"
+
+- name: Pihole | Remove all Pihole containers
+  command: docker rm {{ item}} -f
+  with_items: "{{pihole_containers.stdout_lines}}"
+
+- name: Pihole | Stop and remove Pihole containers
+  docker_compose:
+    project_src: "/home/{{pihole_username}}/pihole/"
+    state: absent
+    remove_images: all
+#     remove_volumes: yes
+
+- name: "Traefik | Create pihole dir in /home/{{pihole_username}}/pihole"
   file:
     path: "/home/{{pihole_username}}/pihole"
     state: directory
     owner: "{{ pihole_username }}"
     group: "{{ pihole_username }}"
     mode: "0750"
+
 - name: "Traefik | Remove previous configuration folder"
   file:
-    path: "/home/{{pihole_username}}/pihole"
+    path: "/home/{{pihole_username}}/pihole/install"
     state: absent
-- name: "Pihole | Clone repo : {{pihole_git_repo}}"
-  git:
-    repo: "{{pihole_git_repo}}"
-    dest: /home/{{pihole_username}}/pihole
-    accept_hostkey: yes
-    key_file: /home/{{ pihole_username }}/.ssh/deploy_key
-- name: "Pihole | Remove .env & docker-compose.yml"
+
+- name: "Traefik | Create install & config dir in /home/{{pihole_username}}/pihole"
   file:
     path: "/home/{{pihole_username}}/pihole/{{item}}"
-    state: absent
+    state: directory
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+    mode: "0750"
   with_items:
-    - .env
-    - docker-compose.yml
+    - install
+    - config
+
+- name: "Pihole | Connect to Git server and clone repository"
+  include_tasks: ./git.yml
+
 - name: "Pihole | Add a new docker-compose.yml"
   template:
     src: templates/docker-compose.yml.j2
-    dest: "/home/{{pihole_username}}/pihole/docker-compose.yml"
+    dest: "/home/{{pihole_username}}/pihole/install/docker-compose.yml"
     owner: "{{ pihole_username }}"
     group: "{{ pihole_username }}"
-- name: Pihole | Register all Docker containers
-  # See https://github.com/ansible/ansible/issues/21304
-  command: docker ps --format "{% raw %}{{.Names}}{% endraw %}"
-  register: docker_containers
+
+- name: Pihole | Build and start Docker containers
+  docker_compose:
+    project_src: "/home/{{pihole_username}}/pihole/install"
+    build: yes
+    nocache: yes
+    remove_orphans: yes
+    state: present
+  register: output
 - debug:
-    var: docker_containers
-# - name: Pihole | Stop all Pihole containers
-#   command: docker stop {{ item}}
-#   with_items: "{{docker_containers.stdout_lines}}"
-#   when: docker_containers.stdout.find('pihole') != -1
-# - name: Pihole | Remove all Pihole containers
-#   command: docker rm {{ item}} -f
-#   with_items: "{{docker_containers.stdout_lines}}"
-#   when: docker_containers.stdout.find('pihole') != -1
-# - name: Pihole | Stop and remove Pihole containers
-#   docker_compose:
-#     project_src: "/home/{{pihole_username}}/pihole/"
-#     state: absent
-#     remove_images: all
-#     remove_volumes: yes
-# - name: Pihole | Build and start Docker containers
-#   docker_compose:
-#     project_src: "/home/{{pihole_username}}/pihole/"
-#     build: yes
-#     nocache: yes
-#     remove_orphans: yes
-#     state: present
-#   register: output
-# - debug:
-#     var: output
+    var: output
