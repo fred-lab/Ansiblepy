@@ -16,7 +16,7 @@
 
 - name: Pihole | Stop and remove Pihole containers
   docker_compose:
-    project_src: "/home/{{pihole_username}}/pihole/"
+    project_src: "/home/{{pihole_username}}/pihole/install"
     state: absent
     remove_images: all
 #     remove_volumes: yes
