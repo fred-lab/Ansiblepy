@@ -42,7 +42,6 @@ For security purpose, the logic is to have one superuser with Sudo privilege and
 This users can only access to theirs **home** folder, which contains the application.  
 For the database, its the same logic, one user for one database, and the user can only access to his own database. 
 
-
 ## VIM
 Go to insert mode : ```i```  
 Echap insert mode : esc button  
@@ -60,3 +59,19 @@ Save (not in insert mode ): ```:x```
 ```ansible-playbook -i hosts raspberry.yml --flush-cache --ask-vault-pass``` : Run the playbook, and ask for a password to decrypt encrypted passwords.
 
 ```ansible-playbook -i hosts raspberry.yml --flush-cache --vault-password-file .vault_pass``` : Run the playbook, with a file who contain a password to decrypt encrypted passwords. You must create this file.
+
+# Pihole & Openvpn  
+To connect to my home network from outside, I can use Openvpn to reach my private network. Openvpn is bound to the Pihole's DNS, so ads are filtered.  
+
+1 - On the ISP Modem, redirect all the trafic from the port 1194/UDP to the LAN IP of the raspeberry Pi.
+
+2 - I use the kylemanna's Openvpn docker image, with a docker-compose, link to the doc : https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md
+
+3 - Generate a Client certificate, connect to the Pi with SSH, and go to : ```cd pihole/install``` and run ```export CLIENTNAME="your_client_name"``` & ```docker-compose run --rm openvpn easyrsa build-client-full $CLIENTNAME```
+
+4 - Get the client certificate : ```docker-compose run --rm openvpn ovpn_getclient $CLIENTNAME > $CLIENTNAME.ovpn```  
+
+5 - Copy the certificate to the host : ```scp pihole_username@raspberry_ip:pihole/install/your_client_name.ovpn ~/Documents```  
+https://www.raspberrypi.org/documentation/remote-access/ssh/scp.md
+
+6 - Use an Openvpn Client with the client certificate to connect to the home network. 
