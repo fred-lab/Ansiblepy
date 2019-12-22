@@ -63,6 +63,10 @@ Save (not in insert mode ): ```:x```
 # Pihole & Openvpn  
 To connect to my home network from outside, I can use Openvpn to reach my private network. Openvpn is bound to the Pihole's DNS, so ads are filtered.  
 
+## Pihole  
+My ISP modem don't allow me to use a custom DNS & use the Pi as a DHCP server don't work, so I use a static IP on each of my device and specify the LAN IP adress of the Pi as DNS to use.  
+
+## Openvpn  
 1 - On the ISP Modem, redirect all the trafic from the port 1194/UDP to the LAN IP of the raspeberry Pi.
 
 2 - I use the kylemanna's Openvpn docker image, with a docker-compose, link to the doc : https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md
@@ -74,4 +78,8 @@ To connect to my home network from outside, I can use Openvpn to reach my privat
 5 - Copy the certificate to the host : ```scp pihole_username@raspberry_ip:pihole/install/your_client_name.ovpn ~/Documents```  
 https://www.raspberrypi.org/documentation/remote-access/ssh/scp.md
 
-6 - Use an Openvpn Client with the client certificate to connect to the home network. 
+6 - Use an Openvpn Client with the client certificate to connect to the home network.  
+
+ ## Links
+ https://demyx.sh/tutorial/how-to-run-openvpn-and-pi-hole-using-docker-in-a-vps/#settingup-openvpn  
+ https://visibilityspots.org/dockerized-cloudflared-pi-hole.html  
