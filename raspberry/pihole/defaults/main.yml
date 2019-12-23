@@ -1,2 +1,30 @@
 ---
-pihole_username: foobar
+  #############
+#   PiHole          #
+#############
+pihole_git_repo: git@github.com:fred-lab/pihole_cloudflared.git
+pihole_username: foo
+pihole_entryPoint: pihole
+# Choose an architecture :
+# amd64 / x86-64 = amd64
+# x86 (32-bit) = 386
+# ARMv6 = arm
+pihole_cloudflared_architecture: arm
+# Cloudflared port
+pihole_cloudflared_port: 5053
+# Timezone = 'America/Chicago'
+pihole_timezone: 'Europe/Paris'
+#http://pi.hole/admin password.
+pihole_password: "{{ vault.pihole_dashboard_password }}"
+# Local IP adress of the Raspberry pi (or server)
+pihole_host_local_ip: 192.0.0.1
+# URL (or IP) Openvpn server
+vpn_serveur_url: "{{py_serveur_url}}"
+# Secondary upstream DNS provider, default is Cloudflare DNS (1.1.1.1)
+pihole_dns2: 1.1.1.1
+# Interface listening behavior
+# local => listens on all local subnets, 
+# all => permits listening on internet origin subnets in addition to local. Note that the last option should not be used on devices which are directly connected to the Internet. This option is safe if your Pi-hole is located within your local network, i.e. protected behind your router, and you have not forwarded port 53 to this device. In virtually all other cases you have to make sure that your Pi-hole is properly firewalled.
+# nic => Allows only queries from devices that are at most one hop away (local devices)
+# <local|all|nic>
+pihole_DNSMASQ_LISTENING: all

@@ -5,6 +5,8 @@ py_default_user: pi
 py_default_user_password: raspberry
 py_root_username: user
 py_root_password: "{{ vault.root_password }}"
+# URL (or IP) Raspberry server
+py_serveur_url: 170.xxx.xxx.xxx
 
 py_locale: fr_FR.UTF-8
 py_timezone: "Europe/Paris"
@@ -64,16 +66,89 @@ traefik_dashboard_pwd: "{{ vault.traefik_dashboard_password }}"
     #############
   #   PiHole          #
 #############
-pihole_username: foobar
+pihole_git_repo: git@github.com:fred-lab/pihole_cloudflared.git
+pihole_username: foo
+pihole_entryPoint: pihole
+# Choose an architecture :
+# amd64 / x86-64 = amd64
+# x86 (32-bit) = 386
+# ARMv6 = arm
+pihole_cloudflared_architecture: arm
+# Cloudflared port
+pihole_cloudflared_port: 5053
+# Timezone = 'America/Chicago'
+pihole_timezone: 'Europe/Paris'
+#http://pi.hole/admin password.
+pihole_password: "{{ vault.pihole_dashboard_password }}"
+# Local IP adress of the Raspberry pi (or server)
+pihole_host_local_ip: 192.0.0.1
+# URL (or IP) Openvpn server
+vpn_serveur_url: "{{py_serveur_url}}"
+# Secondary upstream DNS provider, default is Cloudflare DNS (1.1.1.1)
+pihole_dns2: 1.1.1.1
+# Interface listening behavior
+# local => listens on all local subnets, 
+# all => permits listening on internet origin subnets in addition to local. Note that the last option should not be used on devices which are directly connected to the Internet. This option is safe if your Pi-hole is located within your local network, i.e. protected behind your router, and you have not forwarded port 53 to this device. In virtually all other cases you have to make sure that your Pi-hole is properly firewalled.
+# nic => Allows only queries from devices that are at most one hop away (local devices)
+# <local|all|nic>
+pihole_DNSMASQ_LISTENING: all
 
   ############
  # Firewall #
 ############
+# See : https://docs.ansible.com/ansible/latest/modules/ufw_module.html
 # Permission values are : allow, deny, limit & reject
+# Proto values are : tcp, udp
+# From values are : "any" (for internet connexion) or a specific IP or a range of IP
 firewalls_authorizes_ports:
-  - { port: ssh, permission: limit }
-  - { port: http, permission: allow }
-  - { port: https, permission: allow }
+  # Allow SSH connection only for Local network
+  - { port: ssh, permission: allow, proto: tcp, from: "{{ lan_network }}" }
+  - { port: http, permission: allow, proto: tcp, from: any }
+  - { port: https, permission: allow, proto: tcp, from: any }
+  #8080 is used to access Traefik dashbord
+  - { port: 8080, permission: allow, proto: tcp, from: any }
+  #1194/udp is used to connect to Openvpn server
+  - { port: 1194, permission: allow, proto: udp, from: any }
+lan_network: 192.0.0.0/24
+
+    #########
+  # Fail2Ban #
+#########
+
+# Default
+# "bantime" is the number of seconds or minute that a host is banned.
+default_bantime: 10m
+# A host is banned if it has generated "maxretry" during the last "findtime"
+# seconds.
+default_findtime: 10m
+# "maxretry" is the number of failures before a host get banned.
+default_maxretry: 5
+# "enabled" enables the jails.
+# true:  jail will be enabled and log files will get monitored for changes
+# false: jail is not enabled
+jail_enabled: false
+
+# Actions
+# Choose default action.  To change, just override value of 'action' with the
+# interpolation to the chosen action shortcut (e.g.  action_mw, action_mwl, etc) in jail.local
+# Sending mail require a SMTP server
+# action_ => ban only
+# action_mw => ban & send an e-mail with whois report to the destemail.
+# action_mwl => ban & send an e-mail with whois report and relevant log lines to the destemail
+default_action: action_
+# Destination email address used solely for the interpolations in
+# jail.{conf,local,d/*} configuration files.
+destemail: root@localhost
+# Sender email address used solely for some actions
+sender: root@<fq-hostname>
+
+# Jails
+# Nginx
+nginx_logpath: "%(nginx_error_log)s"
+
+# Recidive
+recidive_bantime: 1w
+recidive_findtime: 1d
 
   #########
  # Vault #
@@ -108,6 +183,13 @@ vault:
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           1234
   traefik_dashboard_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          1234
+  pihole_dashboard_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           12345645678912345678912345678912346578912345678913246578913456789134657891345678

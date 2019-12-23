@@ -12,4 +12,6 @@
     - include_role:
         name: firewall
     - include_role:
+        name: fail2ban
+    - include_role:
         name: tools
