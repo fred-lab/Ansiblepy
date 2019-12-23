@@ -5,6 +5,8 @@
     state: absent
     remove: yes
     force: yes
+- name: Config | Remove Swap partition
+  shell: systemctl disable dphys-swapfile.service
 - name: Config | Change locale
   shell: "raspi-config nonint do_change_locale {{ py_locale }}"
 - name: Config | Change timezone

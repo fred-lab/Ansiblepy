@@ -1,0 +1,73 @@
+---
+- name: Pihole | Register all Docker containers
+  # See https://github.com/ansible/ansible/issues/21304
+  command: docker ps --filter "network=pihole" --format "{% raw %}{{.Names}}{% endraw %}"
+  register: pihole_containers
+- debug:
+    var: pihole_containers
+
+- name: Pihole | Stop all Pihole containers
+  command: docker stop {{ item}}
+  with_items: "{{pihole_containers.stdout_lines}}"
+- debug:
+    var: pihole_containers
+
+- name: Pihole | Remove all Pihole containers
+  command: docker rm {{ item}} -f
+  with_items: "{{pihole_containers.stdout_lines}}"
+- debug:
+    var: pihole_containers
+
+- name: "Pihole | Create pihole dir in /home/{{pihole_username}}/pihole"
+  file:
+    path: "/home/{{pihole_username}}/pihole"
+    state: directory
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+    mode: "0750"
+
+- name: "Pihole | Remove previous configuration folder"
+  file:
+    path: "/home/{{pihole_username}}/pihole/install"
+    state: absent
+
+- name: "Pihole | Create install & config dir in /home/{{pihole_username}}/pihole"
+  file:
+    path: "/home/{{pihole_username}}/pihole/{{item}}"
+    state: directory
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+    mode: "0750"
+  with_items:
+    - install
+    - config
+
+- name: "Pihole | Connect to Git server and clone repository"
+  include_tasks: ./git.yml
+
+- name: "Pihole | Add a new docker-compose.yml"
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: "/home/{{pihole_username}}/pihole/install/docker-compose.yml"
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+
+- name : "Openvpn | Check if an Openvpn conf is present"
+  stat:
+    path: "/home/{{pihole_username}}/pihole/config/openvpn-data/conf/openvpn.conf"
+  register: openvpn_conf
+
+- name: "Openvpn | Configure Openvpn server"
+  include_tasks: ./openvpn.yml
+  when: openvpn_conf.stat.exists == False 
+
+- name: Pihole | Build and start Docker containers
+  docker_compose:
+    project_src: "/home/{{pihole_username}}/pihole/install"
+    build: yes
+    nocache: yes
+    remove_orphans: yes
+    state: present
+  register: output
+- debug:
+    var: output

@@ -1,0 +1,55 @@
+debug = true
+
+logLevel = "{{traefik_log_level}}"
+defaultEntryPoints = ["https","http"]
+
+# API definition
+# Warning: Enabling API will expose Traefik's configuration.
+# It is not recommended in production,
+# unless secured by authentication and authorizations
+[api]
+  # Name of the related entry point
+  entryPoint = "{{traefik_dashboard_entrypoint}}"
+
+  # Enable Dashboard
+  dashboard = true
+
+# Redirect HTTPS (443) traffic to HTTP (80). This ports must be open on the modem/router
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+  [entryPoints.https.tls]
+#Secure the dashboard with a username & password
+  [entryPoints.{{traefik_dashboard_entrypoint}}]
+    address=":8080"
+    [entryPoints.{{traefik_dashboard_entrypoint}}.auth]
+      [entryPoints.{{traefik_dashboard_entrypoint}}.auth.basic]
+      users = ["ecto1:{{traefik_dashboard_pwd}}"]
+
+[retry]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "www.{{ domain }}"
+watch = true
+# Not expose container by default (to avoid "pollution")
+exposedByDefault = false
+usebindportip = true
+
+[acme]
+email = "{{ traefik_contact_mail }}"
+# Path to the acme.json into the traefik container (not the host) Permissions must be 0600
+storage = "/etc/traefik/acme.json"
+entryPoint = "https"
+
+# For test and debugging, uncomment next line. Lets encrypt have rate limit, but there is no limit with the staging CA
+# caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+# Create a certificate for each container (service) which have a traefik host rule defined
+onHostRule = true
+[acme.httpChallenge]
+entryPoint = "http"

@@ -1,0 +1,6 @@
+---
+- name: Trafik | Check Docker service is running
+  service_facts:
+- name: Traefik | Installation
+  include_tasks: install.yml
+  when: "'docker' in services"

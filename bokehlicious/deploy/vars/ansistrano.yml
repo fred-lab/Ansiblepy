@@ -1,0 +1,12 @@
+---
+# Ansistrano global parameters
+ansistrano_deploy_to: "{{project_deploy_dir}}"
+ansistrano_keep_releases: 2
+ansistrano_shared_paths: ["public/galeries"]
+ansistrano_before_symlink_shared_tasks_file: "{{ playbook_dir }}/deploy/tasks/ansistrano/before_symlink.yml"
+ansistrano_after_symlink_tasks_file: "{{ playbook_dir }}/deploy/tasks/ansistrano/after_symlink.yml"
+
+# Git parameters
+ansistrano_deploy_via: git
+ansistrano_git_repo: "ssh://{{ git_repo }}"
+ansistrano_git_branch: docker

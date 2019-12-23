@@ -1,0 +1,19 @@
+---
+- name: Fail2ban | Copy configuration "jail.local"
+  template:
+    src: templates/jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+- name: Fail2ban | Copy filters conf in /etc/fail2ban/filter.d
+  template:
+    src: "{{ item }}"
+    dest: "/etc/fail2ban/filter.d/"
+    owner: root
+    group: root
+  with_fileglob:
+    - "../templates/filters/*"
+- name: Fail2ban | Restart Fail2ban
+  service:
+    name: fail2ban
+    state: restarted

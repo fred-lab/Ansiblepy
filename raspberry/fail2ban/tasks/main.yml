@@ -1,0 +1,5 @@
+---
+- name: Fail2ban | Install task
+  include_tasks: install.yml
+- name: Fail2ban | Configure task
+  include_tasks: config.yml
