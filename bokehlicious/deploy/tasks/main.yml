@@ -1,0 +1,20 @@
+---
+- name: Bokehlicious | Include Ansistrano variables
+  include_vars: ansistrano.yml
+# - name: Bokehlicious | Start deployment
+#   apt:
+#     upgrade: dist
+#     update_cache: yes
+#     autoclean: yes
+- name: Bokehlicious | Configure User
+  include_tasks: ./server/user.yml
+- name: Bokehlicious | Configure SSH
+  include_tasks: ./server/ssh.yml
+- name: Bokehlicious | Install dependencies
+  include_tasks: ./server/dependencies.yml
+- include_role:
+    name: ansistrano.deploy
+    apply:
+      remote_user: "{{ username }}"
+      become: no
+      become_method: sudo

@@ -1,0 +1,89 @@
+version: '3.7'
+
+services:
+  cloudflared:
+    build: 
+      context: ./cloudflared
+      args:
+      - "ARCHITECTURE={{pihole_cloudflared_architecture}}"
+      - "PORT={{pihole_cloudflared_port}}"
+    container_name: cloudflared
+    restart: always
+    networks:
+      pihole:
+        # Define a static ip for the container. The containter can be accessible by outside with this IP.
+        ipv4_address: 172.28.1.2
+      cloudflared:
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      #- "80:80/tcp"
+      #- "443:443/tcp"
+    environment:
+      ServerIP: "{{pihole_host_local_ip}}"
+      TZ: "{{pihole_timezone}}"
+      # http://pi.hole/admin password.
+      WEBPASSWORD: "{{pihole_password}}"
+      #Primary upstream DNS provider. it must be the static IP of Cloudflared container
+      DNS1: '172.28.0.2#5053'
+      # Secondary upstream DNS provider, default is Cloudflare DNS (1.1.1.1)
+      DNS2: "{{pihole_dns2}}"
+      DNSMASQ_LISTENING: "{{pihole_DNSMASQ_LISTENING}}"
+    # Volumes store your data between container upgrades
+    volumes:
+       - '../config/etc-pihole/:/etc/pihole/'
+       - '../config/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    # Recommended but not required (DHCP needs NET_ADMIN)
+    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+    cap_add:
+      - NET_ADMIN
+    restart: always
+    networks:
+      pihole:
+        # Define a static ip for the container. The containter can be accessible by outside with this IP.
+        ipv4_address: 172.28.1.1
+      {{traefik_network}}:
+    depends_on:
+      - cloudflared
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.port=80"
+      - "traefik.enable=true"
+      - "traefik.backend=pihole"
+      - "traefik.frontend.rule=Host:pihole.{{domain}}"
+
+  openvpn:
+    cap_add:
+     - NET_ADMIN
+    build: ./openvpn
+    container_name: openvpn
+    ports:
+     - "1194:1194/udp"
+    restart: always
+    volumes:
+     - ../config/openvpn-data/conf:/etc/openvpn
+    depends_on:
+      - pihole
+    networks:
+      - pihole
+      - {{traefik_network}}
+
+networks:
+  web:
+    external: true
+  pihole:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+    name: pihole
+  cloudflared:
+    name: cloudflared

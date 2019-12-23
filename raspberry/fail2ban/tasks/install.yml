@@ -1,0 +1,15 @@
+---
+    - name: "Fail2Ban | Update all packages (Debian {{ debian_codename }})"
+      apt:
+        upgrade: dist
+    - name: "Fail2Ban | Install Fail2Ban (Debian {{ debian_codename }})"
+      apt:
+        update_cache: yes
+        name: fail2ban
+        state: present
+    - name: Fail2Ban | Remove useless packages from the cache
+      apt:
+        autoclean: yes
+    - name: Fail2Ban | Remove dependencies that are no longer required
+      apt:
+        autoremove: yes

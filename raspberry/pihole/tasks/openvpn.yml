@@ -1,0 +1,30 @@
+---
+- name: Openvpn | Install pexpect
+  pip:
+    name: pexpect
+    state: present
+
+# The docker image is not build for arm processor, so I must clone the repo and let the RPI build the image
+- name: Openvpn | Clone Openvpn repo
+  git:
+    repo: git@github.com:kylemanna/docker-openvpn.git
+    dest: /home/{{pihole_username}}/pihole/install/openvpn
+    accept_hostkey: yes
+    key_file: /home/{{ pihole_username }}/.ssh/deploy_key
+    force: yes
+
+- name: Openvpn | Build the docker image Openvpn
+  command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml build openvpn"
+
+- name: Openvpn | Generate configuration for Openvpn server
+  command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml run --rm openvpn ovpn_genconfig -u udp://{{ vpn_serveur_url }} -n 172.28.1.1"
+
+- name: Openvpn | Initialize new keys for the Openvpn server
+  expect:
+    command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml run --rm openvpn ovpn_initpki"
+    #RPI 3 need at least 4min to generate the 2048 bits dh.pem
+    timeout: 4000 
+    responses: 
+      "New CA Key Passphrase": "{{ py_root_password }}"
+      "pass phrase": "{{ py_root_password }}"
+      "Common Name ": "{{ domain }}"

@@ -1,4 +1,8 @@
 ---
+  # See : https://docs.ansible.com/ansible/latest/modules/ufw_module.html
+- name: Firewall | Reset previous rules
+  ufw:
+    state: reset
 - name: Firewall | Block all incoming trafic & All outcoming trafic
   ufw:
     direction: "{{ item.direction }}"
@@ -10,8 +14,10 @@
   ufw:
     port: "{{ item.port }}"
     rule: "{{ item.permission }}"
+    proto: "{{ item.proto }}"
+    from: "{{ item.from }}"
   loop: "{{ firewalls_authorizes_ports }}"
+# To see UFW status and rules : sudo ufw status verbose
 - name: Firewall | Activate UFW
-  service:
-    name: ufw
-    state: started
+  ufw:
+    state: enabled

@@ -1,0 +1,39 @@
+- name: Pihole | Git | Copy SSH Private Key
+  copy:
+    src: "{{ deploy_private_key }}"
+    dest: "/home/{{ pihole_username }}/.ssh/deploy_key"
+    mode: 0600
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+
+- name: Pihole | Git | Copy SSH public Key
+  copy:
+    src: "{{ deploy_private_key }}.pub"
+    dest: "/home/{{ pihole_username }}/.ssh/deploy_key.pub"
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+
+- name: Pihole | Git | Ensure setfacl support is present.
+  package: 
+    name: acl
+
+- name: Pihole | Git | configure ssh to use ansible key for github.com
+  template:
+    src: templates/ssh_config.j2
+    dest: "/home/{{ pihole_username }}/.ssh/config"
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+
+- name: "Pihole | Clone repo : {{pihole_git_repo}}"
+  git:
+    repo: "{{pihole_git_repo}}"
+    dest: /home/{{pihole_username}}/pihole/install
+    accept_hostkey: yes
+    key_file: /home/{{ pihole_username }}/.ssh/deploy_key
+- name: "Pihole | Remove .env & docker-compose.yml"
+  file:
+    path: "/home/{{pihole_username}}/pihole/install/{{item}}"
+    state: absent
+  with_items:
+    - .env
+    - docker-compose.yml

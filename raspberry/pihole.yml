@@ -1,0 +1,11 @@
+---
+- name: Install Pihole (DNS & Ad blocker)
+  vars_files:
+    - ../parameters.yml
+  hosts: raspberry
+  remote_user: "{{ py_root_username }}"
+  become: true
+  become_method: sudo
+  tasks:
+    - include_role:
+        name: pihole
