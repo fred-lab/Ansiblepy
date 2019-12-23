@@ -17,7 +17,7 @@
   command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml build openvpn"
 
 - name: Openvpn | Generate configuration for Openvpn server
-  command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml run --rm openvpn ovpn_genconfig -u udp://176.158.123.100 -n 172.28.1.1"
+  command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml run --rm openvpn ovpn_genconfig -u udp://{{ vpn_serveur_url }} -n 172.28.1.1"
 
 - name: Openvpn | Initialize new keys for the Openvpn server
   expect:
