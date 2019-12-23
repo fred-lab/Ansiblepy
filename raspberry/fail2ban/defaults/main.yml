@@ -1,0 +1,39 @@
+---
+    #########
+  # Fail2Ban #
+#########
+
+# Default
+# "bantime" is the number of seconds or minute that a host is banned.
+default_bantime: 10m
+# A host is banned if it has generated "maxretry" during the last "findtime"
+# seconds.
+default_findtime: 10m
+# "maxretry" is the number of failures before a host get banned.
+default_maxretry: 5
+# "enabled" enables the jails.
+# true:  jail will be enabled and log files will get monitored for changes
+# false: jail is not enabled
+jail_enabled: false
+
+# Actions
+# Choose default action.  To change, just override value of 'action' with the
+# interpolation to the chosen action shortcut (e.g.  action_mw, action_mwl, etc) in jail.local
+# Sending mail require a SMTP server
+# action_ => ban only
+# action_mw => ban & send an e-mail with whois report to the destemail.
+# action_mwl => ban & send an e-mail with whois report and relevant log lines to the destemail
+default_action: action_
+# Destination email address used solely for the interpolations in
+# jail.{conf,local,d/*} configuration files.
+destemail: root@localhost
+# Sender email address used solely for some actions
+sender: root@<fq-hostname>
+
+# Jails
+# Nginx
+nginx_logpath: "%(nginx_error_log)s"
+
+# Recidive
+recidive_bantime: 1w
+recidive_findtime: 1d
