@@ -52,6 +52,18 @@
     owner: "{{ pihole_username }}"
     group: "{{ pihole_username }}"
 
+# The docker image is not build for arm processor, so I must clone the repo and let the RPI build the image
+- name: Openvpn | Clone Openvpn repo
+  git:
+    repo: git@github.com:kylemanna/docker-openvpn.git
+    dest: /home/{{pihole_username}}/pihole/install/openvpn
+    accept_hostkey: yes
+    key_file: /home/{{ pihole_username }}/.ssh/deploy_key
+    force: yes
+
+- name: Openvpn | Build the docker image Openvpn
+  command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml build openvpn"
+
 - name : "Openvpn | Check if an Openvpn conf is present"
   stat:
     path: "/home/{{pihole_username}}/pihole/config/openvpn-data/conf/openvpn.conf"
