@@ -60,26 +60,27 @@
     accept_hostkey: yes
     key_file: /home/{{ pihole_username }}/.ssh/deploy_key
     force: yes
-
+- name: "Openvpn | Fix : Create missing /etc/openvpn/vars"
+  file:
+    path: "/home/{{ pihole_username }}/pihole/config/vars"
+    state: touch
+    mode: 0777
 - name: Openvpn | Build the docker image Openvpn
   command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml build openvpn"
 
-- name : "Openvpn | Check if an Openvpn conf is present"
+- name: "Openvpn | Check if an Openvpn conf is present"
   stat:
     path: "/home/{{pihole_username}}/pihole/config/openvpn-data/conf/openvpn.conf"
   register: openvpn_conf
 
 - name: "Openvpn | Configure Openvpn server"
   include_tasks: ./openvpn.yml
-  when: openvpn_conf.stat.exists == False 
+  when: openvpn_conf.stat.exists == False
 
 - name: Pihole | Build and start Docker containers
-  docker_compose:
-    project_src: "/home/{{pihole_username}}/pihole/install"
-    build: yes
-    nocache: yes
-    remove_orphans: yes
-    state: present
+  command: docker-compose up -d --build --remove-orphans
+  args:
+    chdir: "/home/{{pihole_username}}/pihole/install"
   register: output
 - debug:
     var: output

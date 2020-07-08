@@ -11,8 +11,8 @@
   expect:
     command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml run --rm openvpn ovpn_initpki"
     #RPI 3 need at least 4min to generate the 2048 bits dh.pem
-    timeout: 4000 
-    responses: 
+    timeout: 4000
+    responses:
       "New CA Key Passphrase": "{{ py_root_password }}"
       "pass phrase": "{{ py_root_password }}"
       "Common Name ": "{{ domain }}"

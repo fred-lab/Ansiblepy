@@ -1,15 +1,17 @@
 ---
-- name : Docker-compose | Install dependencies
+- name: Docker-compose | Install dependencies
   apt:
-      update_cache: yes
-      name:
-        - python-backports.ssl-match-hostname
-        - python-pip
-        - libffi-dev
-      state: present
+    update_cache: yes
+    name:
+      - python-backports.ssl-match-hostname
+      - libffi-dev
+      - libssl-dev
+      - python3
+      - python3-pip
+    state: present
 - name: Docker-compose | Install Docker-Compose
-  pip:
-    name: docker-compose
+  command: pip3 install docker-compose
+  become: yes
 - name: Docker-compose | Remove useless packages from the cache
   apt:
     autoclean: yes

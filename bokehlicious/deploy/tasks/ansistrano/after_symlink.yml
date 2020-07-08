@@ -25,18 +25,24 @@
   with_items: "{{docker_containers.stdout_lines}}"
   when: docker_containers.stdout.find('bokehlicious') != -1
 - name: After symlink | Bokehlicious | Stop and remove Docker containers
-  docker_compose:
-    project_src: "{{ ansistrano_release_path.stdout}}"
-    state: absent
-    remove_images: all
-    remove_volumes: yes
+  command: docker-compose down -v --remove-orphans
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+  # docker_compose:
+  #   project_src: "{{ ansistrano_release_path.stdout}}"
+  #   state: absent
+  #   remove_images: all
+  #   remove_volumes: yes
 - name: After symlink | Bokehlicious | Build and start Docker containers
-  docker_compose:
-    project_src: "{{ ansistrano_release_path.stdout }}"
-    build: yes
-    nocache: yes
-    remove_orphans: yes
-    state: present
+  command: docker-compose up -d --build --remove-orphans
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+  # docker_compose:
+  #   project_src: "{{ ansistrano_release_path.stdout }}"
+  #   build: yes
+  #   nocache: yes
+  #   remove_orphans: yes
+  #   state: present
   register: output
 - debug:
     var: output
