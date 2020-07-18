@@ -5,8 +5,8 @@
     state: absent
     remove: yes
     force: yes
-- name: Config | Remove Swap partition
-  shell: systemctl disable dphys-swapfile.service
+# - name: Config | Remove Swap partition
+#   shell: systemctl disable dphys-swapfile.service
 - name: Config | Change locale
   shell: "raspi-config nonint do_change_locale {{ py_locale }}"
 - name: Config | Change timezone
@@ -18,3 +18,9 @@
   notify: raspberry reboot
 - name: Config | Reload partition table
   shell: partprobe
+- name: Config | Add a Cron task to keep the raspberry updated
+  cron:
+    name: raspberry autoupdate
+    hour: "2"
+    minute: "0"
+    job: "sudo apt update && sudo apt upgrade -y && sudo apt autoclean && sudo apt autoremove > /var/log/syslog "

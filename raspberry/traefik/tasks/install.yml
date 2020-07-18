@@ -25,7 +25,7 @@
     owner: "{{ py_root_username }}"
     group: "{{ py_root_username }}"
     mode: "0600"
-- name: "Traefik | Check if Docker networt {{traefik_network}} exist"
+- name: "Traefik | Check if Docker network {{traefik_network}} exist"
   command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
   register: networks
 - debug:
@@ -34,9 +34,6 @@
   command: "docker network create {{traefik_network}}"
   when: traefik_network not in networks.stdout_lines
 - name: Traefik | Start container
-  docker_compose:
-    project_src: "/home/{{ py_root_username }}/traefik"
-    build: yes
-    nocache: yes
-    remove_orphans: yes
-    state: present
+  command: docker-compose up -d --build --remove-orphans
+  args:
+    chdir: "/home/{{ py_root_username }}/traefik"
