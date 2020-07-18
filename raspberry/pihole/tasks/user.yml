@@ -1,4 +1,10 @@
 ---
+- name: Pihole | Install dependencies
+  apt:
+    update_cache: yes
+    name:
+      - python-pip
+    state: present
 - name: "Pihole | Server | Add group {{ pihole_username }}"
   group:
     name: "{{ pihole_username }}"
@@ -19,3 +25,6 @@
     user: "{{ pihole_username }}"
     state: present
     key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
+- name: Pihole | Git | Ensure setfacl support is present.
+  package:
+    name: acl

@@ -13,10 +13,6 @@
     owner: "{{ pihole_username }}"
     group: "{{ pihole_username }}"
 
-- name: Pihole | Git | Ensure setfacl support is present.
-  package: 
-    name: acl
-
 - name: Pihole | Git | configure ssh to use ansible key for github.com
   template:
     src: templates/ssh_config.j2
