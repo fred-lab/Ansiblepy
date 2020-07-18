@@ -1,0 +1,30 @@
+---
+- name: Media | User | Install dependencies
+  apt:
+    update_cache: yes
+    name:
+      - python-pip
+    state: present
+- name: "Media | User | Add group {{ media_username }}"
+  group:
+    name: "{{ media_username }}"
+    state: present
+- name: Media | User | Find Fish location
+  command: which fish
+  register: fish_location
+- name: "Media | User | Add user {{ media_username }}"
+  user:
+    name: "{{ media_username }}"
+    group: "{{ media_username }}"
+    shell: "{{ fish_location.stdout }}"
+    state: present
+    groups: docker
+    append: yes
+- name: "Media | User | Add SSH key for user {{ media_username }}"
+  authorized_key:
+    user: "{{ media_username }}"
+    state: present
+    key: "{{ lookup('file', '~/.ssh/raspberry_key.pub') }}"
+- name: Media | User | Git | Ensure setfacl support is present.
+  package:
+    name: acl

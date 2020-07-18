@@ -1,0 +1,8 @@
+---
+#############
+#   Media     #
+#############
+domain: bokehlicious.fr
+media_username: media
+emby_http_port: 8096
+emby_https_port: 8920

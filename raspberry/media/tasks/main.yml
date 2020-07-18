@@ -1,0 +1,14 @@
+---
+- name: Media | Check Docker service is running
+  service_facts:
+- name: Media | Add a new user
+  include_tasks: user.yml
+  when: "'docker' in services"
+- name: Media | Install Media container
+  include_tasks: install.yml
+  args:
+    apply:
+      remote_user: "{{ media_username }}"
+      become: no
+      become_method: sudo
+  when: "'docker' in services"

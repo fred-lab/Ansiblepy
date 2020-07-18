@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  emby:
+    image: emby/embyserver_arm32v7:latest
+    container_name: emby
+    restart: always
+    volumes:
+      - ../config/programdata:/config
+      - ../../share:/mnt/share
+    devices:
+      - /dev/vchiq:/dev/vchiq
+    environment:
+      - "UID={{ media_user_uid.stdout }}"
+      - "GID={{ media_user_gid.stdout }}"
+      # - GDLIST=100
+    ports:
+      - "{{ emby_http_port }}:8096"
+      - "{{ emby_https_port }}:8920"
+    labels:
+      - "traefik.docker.network={{traefik_network}}"
+      - "traefik.port={{emby_http_port }}"
+      - "traefik.enable=true"
+      - "traefik.backend=emby"
+      - "traefik.frontend.rule=Host:media.{{domain}}"
+      # Security headers
+      - "traefik.frontend.headers.SSLRedirect=true"
+      - "traefik.frontend.headers.STSSeconds=315360000"
+      - "traefik.frontend.headers.browserXSSFilter=true"
+      - "traefik.frontend.headers.contentTypeNosniff=true"
+      - "traefik.frontend.headers.forceSTSHeader=true"
+      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+      - "traefik.frontend.headers.STSPreload=true"
+      - "traefik.frontend.headers.frameDeny=true"
+    networks:
+      - media
+      - "{{traefik_network}}"
+
+networks:
+  web:
+    external: true
+  media:
+    name: media
