@@ -12,3 +12,5 @@
       become: no
       become_method: sudo
   when: "'docker' in services"
+- name: "Media | Install Samba"
+  include_tasks: ./samba.yml

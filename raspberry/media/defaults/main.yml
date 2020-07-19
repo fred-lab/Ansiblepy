@@ -6,3 +6,19 @@ domain: bokehlicious.fr
 media_username: media
 emby_http_port: 8096
 emby_https_port: 8920
+samba_pwd: pwd
+samba_workgroup: AVALON
+samba_security: auto
+samba_share_comment: Partage Samba Raspberry pi 3B+ pour le dossier Media
+samba_share_path: /home/{{media_username}}/media/share
+samba_share_read_only: no
+samba_share_browsable: yes
+samba_share_guest_ok: yes
+samba_share_create_mask: 0775
+samba_share_directory_mask: 0771
+samba_hosts_allow: 192.168.1.0/24
+samba_hosts_deny: 0.0.0.0/0
+samba_authorizes_ports:
+  - { port: 445, permission: allow, proto: tcp, from: "{{ lan_network }}" }
+  - { port: 137, permission: allow, proto: udp, from: "{{ lan_network }}" }
+  - { port: 138, permission: allow, proto: udp, from: "{{ lan_network }}" }

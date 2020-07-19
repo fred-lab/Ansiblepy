@@ -93,6 +93,29 @@ pihole_dns2: 1.1.1.1
 # <local|all|nic>
 pihole_DNSMASQ_LISTENING: all
 
+#############
+#   Media     #
+#############
+media_username: emby
+emby_http_port: 8096
+emby_https_port: 8920
+samba_pwd: "{{ vault.samba_password }}"
+samba_workgroup: WORKGROUP
+samba_security: auto
+samba_share_comment: Samba share comment
+samba_share_path: /path/to/share
+samba_share_read_only: yes
+samba_share_browsable: no
+samba_share_guest_ok: no
+samba_share_create_mask: 0770
+samba_share_directory_mask: 0770
+samba_hosts_allow: 192.168.0.0/16
+samba_hosts_deny: 0.0.0.0/0
+samba_authorizes_ports:
+  - { port: 445, permission: allow, proto: tcp, from: "{{ lan_network }}" }
+  - { port: 137, permission: allow, proto: udp, from: "{{ lan_network }}" }
+  - { port: 138, permission: allow, proto: udp, from: "{{ lan_network }}" }
+
   ############
  # Firewall #
 ############
@@ -190,6 +213,13 @@ vault:
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           1234
   pihole_dashboard_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          1234
+  samba_password !vault |
           $ANSIBLE_VAULT;1.1;AES256
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
