@@ -13,6 +13,15 @@ py_timezone: "Europe/Paris"
 # See "ls -la /usr/share/X11/xkb/symbols/" to find keybord template
 py_keyboard_layout: "fr"
 
+
+  #############
+ #   ADMIN   #
+#############
+admin_network: admin
+admin_username: foobar
+portainer_uri: portainer.lan
+portainer_gui_port: 9000
+
   ###################
  #   Bokehlicious  #
 ###################

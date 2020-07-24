@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  portainer:
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    #ports:
+      #- {{portainer_gui_port}}:9000
+      # 8000 only use for Edge Agent : https://downloads.portainer.io/edge_agent_guide.pdf
+      #- 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../config:/data
+    labels:
+      - "traefik.docker.network={{traefik_network}}"
+      - "traefik.port={{portainer_gui_port}}"
+      - "traefik.enable=true"
+      - "traefik.backend=portainer"
+      - "traefik.frontend.rule=Host:portainer.{{domain}}"
+      # Security headers
+      - "traefik.frontend.headers.SSLRedirect=true"
+      - "traefik.frontend.headers.STSSeconds=315360000"
+      - "traefik.frontend.headers.browserXSSFilter=true"
+      - "traefik.frontend.headers.contentTypeNosniff=true"
+      - "traefik.frontend.headers.forceSTSHeader=true"
+      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+      - "traefik.frontend.headers.STSPreload=true"
+      - "traefik.frontend.headers.frameDeny=true"
+    networks:
+      - "{{admin_network}}"
+      - "{{traefik_network}}"
+
+networks:
+  {{traefik_network}}:
+    external: true
+  {{admin_network}}:
+    external: true

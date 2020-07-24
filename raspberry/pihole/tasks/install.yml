@@ -67,11 +67,11 @@
     mode: 0777
 # With Alpine 3.12 I have this error Pamtester-0.1.2-r0: BAD signature.
 # The fix I found is to remove this dependence since I don't use it.
-- name: "Openvpn | Fix : Remove Pamtester from the DockerFile"
-  replace:
-    path: "/home/{{ pihole_username }}/pihole/install/openvpn/Dockerfile"
-    regexp: "pamtester"
-    replace: ""
+# - name: "Openvpn | Fix : Remove Pamtester from the DockerFile"
+#   replace:
+#     path: "/home/{{ pihole_username }}/pihole/install/openvpn/Dockerfile"
+#     regexp: "pamtester"
+#     replace: ""
 
 - name: Openvpn | Build the docker image Openvpn
   command: "docker-compose -f /home/{{ pihole_username }}/pihole/install/docker-compose.yml build openvpn"

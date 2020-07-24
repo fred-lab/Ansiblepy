@@ -1,0 +1,8 @@
+---
+#############
+#   ADMIN   #
+#############
+admin_network: admin
+admin_username: foobar
+portainer_uri: portainer.lan
+portainer_gui_port: 9000
