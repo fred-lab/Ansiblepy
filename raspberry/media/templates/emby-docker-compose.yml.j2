@@ -35,9 +35,12 @@ services:
     networks:
       - media
       - "{{traefik_network}}"
+      - "{{docker_lan_network}}"
 
 networks:
-  web:
+  {{traefik_network}}:
+    external: true
+  {{docker_lan_network}}:
     external: true
   media:
     name: media

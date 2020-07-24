@@ -33,13 +33,13 @@
 
 - name: "Media | Emby | Add a new docker-compose.yml"
   template:
-    src: templates/docker-compose.yml.j2
+    src: templates/emby-docker-compose.yml.j2
     dest: "/home/{{media_username}}/media/emby/install/docker-compose.yml"
     owner: "{{ media_username }}"
     group: "{{ media_username }}"
 
 - name: Media | Emby | Build and start Docker containers
-  command: docker-compose up -d --build --remove-orphans
+  command: docker-compose up -d --build
   args:
     chdir: "/home/{{media_username}}/media/emby/install"
   register: output

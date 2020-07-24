@@ -43,3 +43,5 @@
 
 - name: "media | Install Emby media server"
   include_tasks: ./emby.yml
+# - name: "media | Install NextCloud server"
+#   include_tasks: ./nextcloud.yml

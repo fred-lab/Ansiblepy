@@ -25,15 +25,26 @@
     owner: "{{ py_root_username }}"
     group: "{{ py_root_username }}"
     mode: "0600"
-- name: "Traefik | Check if Docker network {{traefik_network}} exist"
+- name: "Traefik | Check and register all Docker network "
   command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
   register: networks
 - debug:
     var: networks
-- name: Traefik | Create Docker network
+
+- name: Traefik | Create Docker network if it don't exist
   command: "docker network create {{traefik_network}}"
   when: traefik_network not in networks.stdout_lines
+
+- name: Traefik | Create Docker Lan network if it don't exist
+  command: "docker network create -d macvlan --subnet={{lan_subnet}} --ip-range={{lan_ip_range}} --gateway={{lan_gateway}} -o parent={{ethernet_interface}} {{docker_lan_network}}"
+  args:
+    chdir: "{{traefik_path}}"
+  when: docker_lan_network not in networks.stdout_lines
+  register: output
+- debug:
+    var: output
+
 - name: Traefik | Start container
-  command: docker-compose up -d --build --remove-orphans
+  command: docker-compose up -d --build
   args:
     chdir: "/home/{{ py_root_username }}/traefik"

@@ -5,14 +5,14 @@
     name: ["samba", "samba-common-bin"]
     state: present
 
-- name: "Media | Samba | Check if smb.conf exist"
-  stat:
-    path: /etc/samba/smb.conf
-  register: conf_exist
+# - name: "Media | Samba | Check if smb.conf exist"
+#   stat:
+#     path: /etc/samba/smb.conf
+#   register: conf_exist
 
-- name: "Media | Samba | Copy smb.conf to smb.conf.dist for backup"
-  command: mw /etc/samba/smb.conf /etc/samba/smb.conf.dist
-  when: conf_exist.stat.exists
+# - name: "Media | Samba | Copy smb.conf to smb.conf.dist for backup"
+#   command: mw /etc/samba/smb.conf /etc/samba/smb.conf.dist
+#   when: conf_exist.stat.exists
 
 - name: "Media | Samba | Add a new config file"
   template:
