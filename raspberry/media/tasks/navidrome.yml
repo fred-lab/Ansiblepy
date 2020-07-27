@@ -1,0 +1,69 @@
+---
+- name: "Media | navidrome | Create musics dir in /home/{{media_username}}/media/share"
+  file:
+    path: "/home/{{media_username}}/media/share/musics"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+
+- name: "Media | navidrome | Create navidrome dir in /home/{{media_username}}/media"
+  file:
+    path: "/home/{{media_username}}/media/navidrome"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+
+- name: "Media | navidrome | Remove previous navidrome install folder"
+  file:
+    path: "/home/{{media_username}}/media/navidrome/install"
+    state: absent
+
+- name: "Media | navidrome | Create Install & config dir in /home/{{media_username}}/media/navidrome"
+  file:
+    path: "/home/{{media_username}}/media/navidrome/{{item}}"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+  with_items:
+    - install
+    - config
+
+- name: "Media | navidrome | Create data / playlists / podcasts dir in /home/{{media_username}}/media/navidrome/config"
+  file:
+    path: "/home/{{media_username}}/media/navidrome/config/{{item}}"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+  with_items:
+    - data
+    - playlists
+    - podcasts
+
+- name: "Media | navidrome | Add a new docker-compose.yml"
+  template:
+    src: templates/navidrome-docker-compose.yml.j2
+    dest: "/home/{{media_username}}/media/navidrome/install/docker-compose.yml"
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+
+- name: "Media | navidrome | Check and register all Docker network "
+  command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
+  register: networks
+- debug:
+    var: networks
+
+- name: Media | navidrome | Create {{media_network}} network if it don't exist
+  command: "docker network create {{media_network}}"
+  when: media_network not in networks.stdout_lines
+
+- name: Media | navidrome | Build and start Docker containers
+  command: docker-compose up -d --build
+  args:
+    chdir: "/home/{{media_username}}/media/navidrome/install"
+  register: output
+- debug:
+    var: output

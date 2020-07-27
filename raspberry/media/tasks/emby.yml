@@ -38,6 +38,16 @@
     owner: "{{ media_username }}"
     group: "{{ media_username }}"
 
+- name: "Media | Emby | Check and register all Docker network "
+  command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
+  register: networks
+- debug:
+    var: networks
+
+- name: Media | Emby | Create {{media_network}} network if it don't exist
+  command: "docker network create {{media_network}}"
+  when: media_network not in networks.stdout_lines
+
 - name: Media | Emby | Build and start Docker containers
   command: docker-compose up -d --build
   args:

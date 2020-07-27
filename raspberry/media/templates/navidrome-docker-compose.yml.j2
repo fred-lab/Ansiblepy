@@ -1,28 +1,28 @@
 version: '3.8'
 
 services:
-  emby:
-    image: emby/embyserver_arm32v7:latest
-    container_name: {{emby_name}}
-    restart: always
-    volumes:
-      - ../config/programdata:/config
-      - ../../share:/mnt/share
-    devices:
-      - /dev/vchiq:/dev/vchiq
-    environment:
-      - "UID={{ media_user_uid.stdout }}"
-      - "GID={{ media_user_gid.stdout }}"
-      # - GDLIST=100
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: {{media_user_uid.stdout}}:{{media_user_gid.stdout}} # should be owner of volumes
     #ports:
-    #  - "{{ emby_http_port }}:8096"
-    #  - "{{ emby_https_port }}:8920"
+    #  - "4533:4533"
+    restart: unless-stopped
+    environment:
+      # Optional: put your config options customization here. Examples:
+      ND_SCANINTERVAL: 1m
+      ND_LOGLEVEL: debug
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    volumes:
+      - "../config:/data"
+      - "../../share/musics:/music:ro"
     labels:
       - "traefik.docker.network={{traefik_network}}"
-      - "traefik.port={{emby_http_port }}"
+      - "traefik.port={{navidrome_web_port}}"
       - "traefik.enable=true"
-      - "traefik.backend={{emby_name}}"
-      - "traefik.frontend.rule=Host:media.{{domain}}"
+      - "traefik.backend={{navidrome_name}}"
+      - "traefik.frontend.rule=Host:music.{{domain}}"
       # Security headers
       - "traefik.frontend.headers.SSLRedirect=true"
       - "traefik.frontend.headers.STSSeconds=315360000"
@@ -35,13 +35,9 @@ services:
     networks:
       {{media_network}}:
       {{traefik_network}}:
-      {{docker_lan_network}}:
-        ipv4_address: 192.168.1.100
 
 networks:
   {{traefik_network}}:
-    external: true
-  {{docker_lan_network}}:
     external: true
   {{media_network}}:
     external: true

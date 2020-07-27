@@ -4,10 +4,15 @@
 #############
 domain: domain.fr
 media_username: media
+media_network: media
+media_timezone: "Europe/Paris"
+emby_name: emby
 emby_http_port: 8096
 emby_https_port: 8920
+navidrome_name: navidrome
+navidrome_web_port: 4533
 samba_pwd: pwd
-samba_workgroup: AVALON
+samba_workgroup: WORKGROUP
 samba_security: auto
 samba_share_comment: Samba Share
 samba_share_path: /home/{{media_username}}/media/share

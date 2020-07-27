@@ -1,38 +1,48 @@
 ---
-- name: Media | Register all Media containers
-  # See https://github.com/ansible/ansible/issues/21304
-  command: docker ps --filter "network=media" --format "{% raw %}{{.Names}}{% endraw %}"
-  register: media_containers
-- debug:
-    var: media_containers
+# - name: Media | Register all Media containers
+#   # See https://github.com/ansible/ansible/issues/21304
+#   command: docker ps --filter "network=media" --format "{% raw %}{{.Names}}{% endraw %}"
+#   register: media_containers
+# - debug:
+#     var: media_containers
 
-- name: Media | Stop all Media containers
-  command: docker stop {{ item}}
-  with_items: "{{media_containers.stdout_lines}}"
-- debug:
-    var: media_containers
+# - name: Media | Stop all Media containers
+#   command: docker stop {{ item}}
+#   with_items: "{{media_containers.stdout_lines}}"
+# - debug:
+#     var: media_containers
 
-- name: Media | Remove all Media containers
-  command: docker rm {{ item}} -f
-  with_items: "{{media_containers.stdout_lines}}"
-- debug:
-    var: media_containers
+# - name: Media | Remove all Media containers
+#   command: docker rm {{ item}} -f
+#   with_items: "{{media_containers.stdout_lines}}"
+# - debug:
+#     var: media_containers
 
-- name: "Media | Create Media dir in /home/{{media_username}}/media"
-  file:
-    path: "/home/{{media_username}}/media"
-    state: directory
-    owner: "{{ media_username }}"
-    group: "{{ media_username }}"
-    mode: "0750"
+# - name: "Media | Check and register all Docker network "
+#   command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
+#   register: networks
+# - debug:
+#     var: networks
 
-- name: "Media | Create Share dir in /home/{{media_username}}/media"
-  file:
-    path: "/home/{{media_username}}/media/share"
-    state: directory
-    owner: "{{ media_username }}"
-    group: "{{ media_username }}"
-    mode: "0750"
+# - name: Media |  Create {{media_network}} network if it don't exist
+#   command: "docker network create {{media_network}}"
+#   when: media_network not in networks.stdout_lines
+
+# - name: "Media | Create Media dir in /home/{{media_username}}/media"
+#   file:
+#     path: "/home/{{media_username}}/media"
+#     state: directory
+#     owner: "{{ media_username }}"
+#     group: "{{ media_username }}"
+#     mode: "0750"
+
+# - name: "Media | Create Share dir in /home/{{media_username}}/media"
+#   file:
+#     path: "/home/{{media_username}}/media/share"
+#     state: directory
+#     owner: "{{ media_username }}"
+#     group: "{{ media_username }}"
+#     mode: "0750"
 
 - name: Media | Get {{ media_username }} UID
   command: id -u
@@ -41,7 +51,10 @@
   command: id -g
   register: media_user_gid
 
-- name: "media | Install Emby media server"
-  include_tasks: ./emby.yml
+# - name: "media | Install Emby media server"
+#   include_tasks: ./emby.yml
+
+- name: "media | Install navidrome music server"
+  include_tasks: ./navidrome.yml
 # - name: "media | Install NextCloud server"
 #   include_tasks: ./nextcloud.yml

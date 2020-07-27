@@ -1,9 +1,9 @@
 ---
 - name: Media | Check Docker service is running
   service_facts:
-- name: Media | Add a new user
-  include_tasks: user.yml
-  when: "'docker' in services"
+# - name: Media | Add a new user
+#   include_tasks: user.yml
+#   when: "'docker' in services"
 - name: Media | Install Media container
   include_tasks: install.yml
   args:
@@ -12,5 +12,5 @@
       become: no
       become_method: sudo
   when: "'docker' in services"
-- name: "Media | Install Samba"
-  include_tasks: ./samba.yml
+# - name: "Media | Install Samba"
+#   include_tasks: ./samba.yml
