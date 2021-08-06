@@ -112,6 +112,14 @@ pihole_dns2: 1.1.1.1
 # <local|all|nic>
 pihole_DNSMASQ_LISTENING: all
 
+
+################
+#   Wireguard #
+#############
+wireguard_peers: name_1,name_2
+wireguard_dns: 172.28.1.1,1.1.1.1
+wireguard_server_port: 51820
+
 #############
 #   Media     #
 #############

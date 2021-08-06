@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  wireguard:
+    image: ghcr.io/linuxserver/wireguard
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - "PUID={{ user_uid.stdout }}"
+      - "PGID={{ user_gid.stdout }}"
+      - "TZ={{pihole_timezone}}"
+      - "SERVERURL=vpn.{{domain}}" #optional
+      - SERVERPORT={{wireguard_server_port}} #optional
+      - "PEERS={{wireguard_peers}}" #optional
+      - "PEERDNS={{wireguard_dns}}" #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      - ALLOWEDIPS=0.0.0.0/0 #optional
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+    networks:
+      - wireguard
+      - pihole
+      - {{traefik_network}}
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.port={{wireguard_server_port}}"
+      - "traefik.enable=true"
+      - "traefik.backend=wireguard"
+      - "traefik.frontend.rule=Host:vpn.{{domain}}"
+
+networks:
+  wireguard:
+    name: wireguard
+  web:
+    external: true
+  pihole:
+    external: true

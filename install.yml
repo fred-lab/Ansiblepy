@@ -13,6 +13,8 @@
 - import_playbook: ./bokehlicious/deploy.yml
 # Deploy Pihole with Openvpn
 - import_playbook: ./raspberry/pihole.yml
+# Deploy Wireguard
+- import_playbook: ./raspberry/wireguard.yml
 # Deploy Media services
 - import_playbook: ./raspberry/media.yml
 # Deploy Admin interface

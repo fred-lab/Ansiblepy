@@ -1,0 +1,49 @@
+---
+- name: "Admin | Guacamole | Create Guacamole dir in /home/{{admin_username}}/admin"
+  file:
+    path: "/home/{{admin_username}}/admin/guacamole"
+    state: directory
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: "0750"
+
+- name: "Admin | Guacamole | Remove previous Guacamole install folder"
+  file:
+    path: "/home/{{admin_username}}/admin/guacamole/install"
+    state: absent
+
+- name: "Admin | Guacamole | Create Install & config dir in /home/{{admin_username}}/admin/guacamole"
+  file:
+    path: "/home/{{admin_username}}/admin/guacamole/{{item}}"
+    state: directory
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: "0750"
+  with_items:
+    - install
+    - config
+
+- name: "Admin | Guacamole | Add a new docker-compose.yml"
+  template:
+    src: templates/guacamole-docker-compose.yml.j2
+    dest: "/home/{{admin_username}}/admin/guacamole/install/docker-compose.yml"
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+
+- name: "Admin | Guacamole | Check and register all Docker network "
+  command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
+  register: networks
+- debug:
+    var: networks
+
+- name: Admin | Guacamole  | Create Docker network if it don't exist
+  command: "docker network create {{admin_network}}"
+  when: admin_network not in networks.stdout_lines
+
+- name: Admin | Guacamole | Build and start Docker containers
+  command: docker-compose up -d --build
+  args:
+    chdir: "/home/{{admin_username}}/admin/guacamole/install"
+  register: output
+- debug:
+    var: output

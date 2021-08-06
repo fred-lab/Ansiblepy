@@ -1,0 +1,57 @@
+---
+- name: Wireguard | Register all Docker containers
+  # See https://github.com/ansible/ansible/issues/21304
+  command: docker ps --filter "network=wireguard" --format "{% raw %}{{.Names}}{% endraw %}"
+  register: wireguard_containers
+- debug:
+    var: wireguard_containers
+
+- name: Wireguard | Stop all Wireguard containers
+  command: docker stop {{ item}}
+  with_items: "{{wireguard_containers.stdout_lines}}"
+- debug:
+    var: wireguard_containers
+
+- name: Wireguard | Remove all Wiregard containers
+  command: docker rm {{ item}} -f
+  with_items: "{{wireguard_containers.stdout_lines}}"
+- debug:
+    var: wireguard_containers
+
+- name: "Wireguard | Create wireguard dir in /home/{{pihole_username}}/wireguard"
+  file:
+    path: "/home/{{pihole_username}}/wireguard"
+    state: directory
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+    mode: "0750"
+
+- name: "Wireguard | Create config dir in /home/{{pihole_username}}/wireguard"
+  file:
+    path: "/home/{{pihole_username}}/wireguard/config"
+    state: directory
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+    mode: "0750"
+
+- name: Wireguard | Get current user UID
+  command: id -u
+  register: user_uid
+- name: Wireguard | Get current user GID
+  command: id -g
+  register: user_gid
+
+- name: "Wireguard | Add a new docker-compose.yml"
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: "/home/{{pihole_username}}/wireguard/docker-compose.yml"
+    owner: "{{ pihole_username }}"
+    group: "{{ pihole_username }}"
+
+- name: Wireguard | Build and start Docker containers
+  command: docker-compose up -d --build
+  args:
+    chdir: "/home/{{pihole_username}}/wireguard"
+  register: output
+- debug:
+    var: output
