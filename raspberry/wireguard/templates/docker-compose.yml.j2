@@ -21,14 +21,14 @@ services:
       - ./config:/config
       - /lib/modules:/lib/modules
     ports:
-      - 51820:51820/udp
+      - "{{wireguard_server_port}}:51820/udp"
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
     networks:
       - wireguard
       - pihole
-      - {{traefik_network}}
+      - "{{traefik_network}}"
     labels:
       - "traefik.docker.network=web"
       - "traefik.port={{wireguard_server_port}}"

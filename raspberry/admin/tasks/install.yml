@@ -6,25 +6,28 @@
 - debug:
     var: admin_containers
 
-- name: Admin | Stop all Media containers
-  command: docker stop {{ item}}
-  with_items: "{{admin_containers.stdout_lines}}"
-- debug:
-    var: admin_containers
+# - name: Admin | Stop all Media containers
+#   command: docker stop {{ item}}
+#   with_items: "{{admin_containers.stdout_lines}}"
+# - debug:
+#     var: admin_containers
 
-- name: Admin | Remove all Media containers
-  command: docker rm {{ item}} -f
-  with_items: "{{admin_containers.stdout_lines}}"
-- debug:
-    var: admin_containers
+# - name: Admin | Remove all Media containers
+#   command: docker rm {{ item}} -f
+#   with_items: "{{admin_containers.stdout_lines}}"
+# - debug:
+#     var: admin_containers
 
-- name: "Admin | Create admin dir in /home/{{admin_username}}"
-  file:
-    path: "/home/{{admin_username}}/admin"
-    state: directory
-    owner: "{{ admin_username }}"
-    group: "{{ admin_username }}"
-    mode: "0750"
+# - name: "Admin | Create admin dir in /home/{{admin_username}}"
+#   file:
+#     path: "/home/{{admin_username}}/admin"
+#     state: directory
+#     owner: "{{ admin_username }}"
+#     group: "{{ admin_username }}"
+#     mode: "0750"
 
-- name: "Admin | Install Portainer"
-  include_tasks: ./portainer.yml
+# - name: "Admin | Install Portainer"
+#   include_tasks: ./portainer.yml
+
+- name: "Admin | Install Guacamole"
+  include_tasks: ./guacamole.yml
