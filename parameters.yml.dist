@@ -166,6 +166,8 @@ firewalls_authorizes_ports:
   - { port: 8080, permission: allow, proto: tcp, from: any }
   #1194/udp is used to connect to Openvpn server
   - { port: 1194, permission: allow, proto: udp, from: any }
+  #51820/udp is used to connect to Wireguard server
+  - { port: 51820, permission: allow, proto: udp, from: any }
 lan_network: 192.0.0.0/24
 
     #########
