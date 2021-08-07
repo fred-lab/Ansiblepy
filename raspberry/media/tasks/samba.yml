@@ -1,0 +1,52 @@
+---
+- name: "Media | Samba | Install Samba"
+  apt:
+    update_cache: yes
+    name: ["samba", "samba-common-bin"]
+    state: present
+
+# - name: "Media | Samba | Check if smb.conf exist"
+#   stat:
+#     path: /etc/samba/smb.conf
+#   register: conf_exist
+
+# - name: "Media | Samba | Copy smb.conf to smb.conf.dist for backup"
+#   command: mw /etc/samba/smb.conf /etc/samba/smb.conf.dist
+#   when: conf_exist.stat.exists
+
+- name: "Media | Samba | Add a new config file"
+  template:
+    src: templates/smb.conf.j2
+    dest: "/etc/samba/smb.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Media | Samba | Add a user to Samba"
+  shell: "printf '{{samba_pwd}}\n{{samba_pwd}}\n' | smbpasswd -a {{media_username}}"
+
+- name: "Media | Samba | Restart Samba Service"
+  service:
+    name: smbd
+    state: restarted
+
+- name: "Media | Samba | Open Samba port in UFW"
+  ufw:
+    port: "{{ item.port }}"
+    rule: "{{ item.permission }}"
+    proto: "{{ item.proto }}"
+    from: "{{ item.from }}"
+  loop: "{{ samba_authorizes_ports }}"
+
+  # To see UFW status and rules : sudo ufw status verbose
+- name: "Media | Samba | Reload Firewall UFW"
+  ufw:
+    state: enabled
+
+- name: "Media | Samba | Remove useless packages from the cache"
+  apt:
+    autoclean: yes
+
+- name: "Media | Samba | Remove dependencies that are no longer required"
+  apt:
+    autoremove: yes

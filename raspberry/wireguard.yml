@@ -1,0 +1,11 @@
+---
+- name: Install Wireguard (VPN Server)
+  vars_files:
+    - ../parameters.yml
+  hosts: raspberry
+  remote_user: "{{ py_root_username }}"
+  become: true
+  become_method: sudo
+  tasks:
+    - include_role:
+        name: wireguard

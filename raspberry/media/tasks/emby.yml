@@ -1,0 +1,57 @@
+---
+- name: "Media | Emby | Create Emby dir in /home/{{media_username}}/media"
+  file:
+    path: "/home/{{media_username}}/media/emby"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+
+- name: "Media | Emby | Remove previous Emby install folder"
+  file:
+    path: "/home/{{media_username}}/media/emby/install"
+    state: absent
+
+- name: "Media | Emby | Create Install & config dir in /home/{{media_username}}/media/emby"
+  file:
+    path: "/home/{{media_username}}/media/emby/{{item}}"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+  with_items:
+    - install
+    - config
+
+- name: "Media | Emby | Create programdata dir in /home/{{media_username}}/media/emby/config"
+  file:
+    path: "/home/{{media_username}}/media/emby/config/programdata"
+    state: directory
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+    mode: "0750"
+
+- name: "Media | Emby | Add a new docker-compose.yml"
+  template:
+    src: templates/emby-docker-compose.yml.j2
+    dest: "/home/{{media_username}}/media/emby/install/docker-compose.yml"
+    owner: "{{ media_username }}"
+    group: "{{ media_username }}"
+
+- name: "Media | Emby | Check and register all Docker network "
+  command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
+  register: networks
+- debug:
+    var: networks
+
+- name: Media | Emby | Create {{media_network}} network if it don't exist
+  command: "docker network create {{media_network}}"
+  when: media_network not in networks.stdout_lines
+
+- name: Media | Emby | Build and start Docker containers
+  command: docker-compose up -d --build
+  args:
+    chdir: "/home/{{media_username}}/media/emby/install"
+  register: output
+- debug:
+    var: output

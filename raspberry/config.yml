@@ -7,11 +7,11 @@
   become: true
   become_method: sudo
   tasks:
-    - include_role:
-        name: tools
-    - include_role:
-        name: config
+    # - include_role:
+    #     name: tools
+    # - include_role:
+    #     name: config
     - include_role:
         name: firewall
-    - include_role:
-        name: fail2ban
+    # - include_role:
+    #     name: fail2ban

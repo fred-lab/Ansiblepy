@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  guacamole:
+    image: oznu/guacamole:armhf
+    container_name: guacamole
+    restart: unless-stopped
+    volumes:
+      - postgres:/config
+    environment:
+      - EXTENSIONS=auth-totp
+    labels:
+      - "traefik.docker.network={{traefik_network}}"
+      - "traefik.port={{guacamole_gui_port}}"
+      - "traefik.enable=true"
+      - "traefik.backend=guacamole"
+      - "traefik.frontend.rule=Host:remote.{{domain}}"
+      # Security headers
+      - "traefik.frontend.headers.SSLRedirect=true"
+      - "traefik.frontend.headers.STSSeconds=315360000"
+      - "traefik.frontend.headers.browserXSSFilter=true"
+      - "traefik.frontend.headers.contentTypeNosniff=true"
+      - "traefik.frontend.headers.forceSTSHeader=true"
+      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+      - "traefik.frontend.headers.STSPreload=true"
+      - "traefik.frontend.headers.frameDeny=true"
+    networks:
+      - "{{admin_network}}"
+      - "{{traefik_network}}"
+
+networks:
+  {{traefik_network}}:
+    external: true
+  {{admin_network}}:
+    external: true
+
+volumes:
+  postgres: {}

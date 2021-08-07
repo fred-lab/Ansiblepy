@@ -1,0 +1,49 @@
+---
+- name: "Admin | Portainer | Create Portainer dir in /home/{{admin_username}}/admin"
+  file:
+    path: "/home/{{admin_username}}/admin/portainer"
+    state: directory
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: "0750"
+
+- name: "Admin | Portainer | Remove previous Portainer install folder"
+  file:
+    path: "/home/{{admin_username}}/admin/portainer/install"
+    state: absent
+
+- name: "Admin | Portainer | Create Install & config dir in /home/{{admin_username}}/admin/portainer"
+  file:
+    path: "/home/{{admin_username}}/admin/portainer/{{item}}"
+    state: directory
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+    mode: "0750"
+  with_items:
+    - install
+    - config
+
+- name: "Admin | Portainer | Add a new docker-compose.yml"
+  template:
+    src: templates/portainer-docker-compose.yml.j2
+    dest: "/home/{{admin_username}}/admin/portainer/install/docker-compose.yml"
+    owner: "{{ admin_username }}"
+    group: "{{ admin_username }}"
+
+- name: "Admin | Portainer | Check and register all Docker network "
+  command: docker network ls --format "{% raw %}{{.Name}}{% endraw %}"
+  register: networks
+- debug:
+    var: networks
+
+- name: Admin | Portainer  | Create Docker network if it don't exist
+  command: "docker network create {{admin_network}}"
+  when: admin_network not in networks.stdout_lines
+
+- name: Admin | Portainer | Build and start Docker containers
+  command: docker-compose up -d --build
+  args:
+    chdir: "/home/{{admin_username}}/admin/portainer/install"
+  register: output
+- debug:
+    var: output

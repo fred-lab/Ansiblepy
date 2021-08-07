@@ -1,0 +1,6 @@
+---
+- name: Admin | Check Docker service is running
+  service_facts:
+- name: Admin | Install some administration's stuff
+  include_tasks: install.yml
+  when: "'docker' in services"

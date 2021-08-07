@@ -1,4 +1,4 @@
-version: '3'
+version: '2.3'
 
 services:
  traefik:
@@ -33,5 +33,5 @@ services:
     - web
   
 networks: 
-  web:
+  {{traefik_network}}:
     external: true

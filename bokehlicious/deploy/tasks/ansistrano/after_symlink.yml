@@ -34,7 +34,7 @@
   #   remove_images: all
   #   remove_volumes: yes
 - name: After symlink | Bokehlicious | Build and start Docker containers
-  command: docker-compose up -d --build --remove-orphans
+  command: docker-compose up -d --build
   args:
     chdir: "{{ ansistrano_release_path.stdout }}"
   # docker_compose:

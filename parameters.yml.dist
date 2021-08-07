@@ -13,6 +13,15 @@ py_timezone: "Europe/Paris"
 # See "ls -la /usr/share/X11/xkb/symbols/" to find keybord template
 py_keyboard_layout: "fr"
 
+
+  #############
+ #   ADMIN   #
+#############
+admin_network: admin
+admin_username: foobar
+portainer_uri: portainer.lan
+portainer_gui_port: 9000
+
   ###################
  #   Bokehlicious  #
 ###################
@@ -60,7 +69,17 @@ traefik_path: "/home/{{ py_root_username }}/traefik"
 # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
 traefik_log_level: DEBUG
 traefik_dashboard_entrypoint: traefik
+# traefik_network allow container to be reached from outside the lan network (with the reverse proxy)
 traefik_network: web
+# lan_network allow container to be reached from inside the lan network (with the docker macvlan driver)
+lan_network: lan
+# ethernet_interface : find your ethernet interface with ifconfig (eth0, enp3s0)
+ethernet_interface: eth0
+# lan_subnet : your local subnet
+lan_subnet: 192.168.1.0/16
+# define a range of ip for the containers connected to this network.
+lan_ip_range: 192.168.1.150/26
+lan_gateway: 192.168.1.254
 traefik_dashboard_pwd: "{{ vault.traefik_dashboard_password }}"
 
     #############
@@ -93,6 +112,44 @@ pihole_dns2: 1.1.1.1
 # <local|all|nic>
 pihole_DNSMASQ_LISTENING: all
 
+
+################
+#   Wireguard #
+#############
+wireguard_peers: name_1,name_2
+wireguard_dns: 172.28.1.1,1.1.1.1
+wireguard_server_port: 51820
+
+#############
+#   Media     #
+#############
+media_username: media
+media_network: media
+media_timezone: "Europe/Paris"
+emby_name: emby
+emby_http_port: 8096
+emby_https_port: 8920
+navidrome_name: navidrome
+navidrome_web_port: 4533
+samba_pwd: pwd
+samba_workgroup: WORKGROUP
+samba_security: auto
+samba_share_comment: Samba Share
+samba_share_path: /home/{{media_username}}/media/share
+samba_share_read_only: no
+samba_share_browsable: yes
+samba_share_guest_ok: yes
+samba_share_create_mask: 0775
+samba_share_directory_mask: 0771
+samba_hosts_allow: 192.168.0.0/24
+samba_hosts_deny: 0.0.0.0/0
+samba_authorizes_ports:
+  - { port: 445, permission: allow, proto: tcp, from: "{{ lan_network }}" }
+  - { port: 137, permission: allow, proto: udp, from: "{{ lan_network }}" }
+  - { port: 138, permission: allow, proto: udp, from: "{{ lan_network }}" }
+nextcloud_timezone: "Europe/Paris"
+nextcloud_port: 443
+
   ############
  # Firewall #
 ############
@@ -109,6 +166,8 @@ firewalls_authorizes_ports:
   - { port: 8080, permission: allow, proto: tcp, from: any }
   #1194/udp is used to connect to Openvpn server
   - { port: 1194, permission: allow, proto: udp, from: any }
+  #51820/udp is used to connect to Wireguard server
+  - { port: 51820, permission: allow, proto: udp, from: any }
 lan_network: 192.0.0.0/24
 
     #########
@@ -190,6 +249,13 @@ vault:
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           1234
   pihole_dashboard_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          12345645678912345678912345678912346578912345678913246578913456789134657891345678
+          1234
+  samba_password !vault |
           $ANSIBLE_VAULT;1.1;AES256
           12345645678912345678912345678912346578912345678913246578913456789134657891345678
           12345645678912345678912345678912346578912345678913246578913456789134657891345678

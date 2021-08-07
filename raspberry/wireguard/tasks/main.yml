@@ -1,0 +1,11 @@
+---
+- name: Wireguard | Check Docker service is running
+  service_facts:
+- name: Wireguard | Install Wireguard
+  include_tasks: install.yml
+  args:
+    apply:
+      remote_user: "{{ pihole_username }}"
+      become: no
+      become_method: sudo
+  when: "'docker' in services"
